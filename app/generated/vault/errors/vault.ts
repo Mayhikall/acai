@@ -14,19 +14,160 @@ import {
 } from "@solana/kit";
 import { VAULT_PROGRAM_ADDRESS } from "../programs";
 
-/** VaultAlreadyExists: Vault already exists */
-export const VAULT_ERROR__VAULT_ALREADY_EXISTS = 0x1770; // 6000
-/** InvalidAmount: Invalid amount */
-export const VAULT_ERROR__INVALID_AMOUNT = 0x1771; // 6001
+/** NotCreator: Signer is not creator */
+export const VAULT_ERROR__NOT_CREATOR = 0x1770; // 6000
+/** NotClipper: Signer is not clipper */
+export const VAULT_ERROR__NOT_CLIPPER = 0x1771; // 6001
+/** NotOracle: Signer is not authorized oracle */
+export const VAULT_ERROR__NOT_ORACLE = 0x1772; // 6002
+/** NotAdmin: Signer is not admin */
+export const VAULT_ERROR__NOT_ADMIN = 0x1773; // 6003
+/** NotUpgradeAuthority: Signer is not program upgrade authority */
+export const VAULT_ERROR__NOT_UPGRADE_AUTHORITY = 0x1774; // 6004
+/** ConfigAlreadyInitialized: Config account already initialized */
+export const VAULT_ERROR__CONFIG_ALREADY_INITIALIZED = 0x1775; // 6005
+/** InvalidParams: Invalid parameters provided */
+export const VAULT_ERROR__INVALID_PARAMS = 0x1776; // 6006
+/** InvalidMint: Invalid token mint */
+export const VAULT_ERROR__INVALID_MINT = 0x1777; // 6007
+/** CampaignNotFunded: Campaign is not funded */
+export const VAULT_ERROR__CAMPAIGN_NOT_FUNDED = 0x1778; // 6008
+/** CampaignNotActive: Campaign is not active */
+export const VAULT_ERROR__CAMPAIGN_NOT_ACTIVE = 0x1779; // 6009
+/** CampaignClosed: Campaign is already closed */
+export const VAULT_ERROR__CAMPAIGN_CLOSED = 0x177a; // 6010
+/** OutsideCampaignPeriod: Outside allowed campaign period */
+export const VAULT_ERROR__OUTSIDE_CAMPAIGN_PERIOD = 0x177b; // 6011
+/** SelfSubmission: Creator cannot submit to own campaign */
+export const VAULT_ERROR__SELF_SUBMISSION = 0x177c; // 6012
+/** QuotaExceeded: Active video quota reached for clipper */
+export const VAULT_ERROR__QUOTA_EXCEEDED = 0x177d; // 6013
+/** TotalQuotaExceeded: Total submission quota reached for clipper */
+export const VAULT_ERROR__TOTAL_QUOTA_EXCEEDED = 0x177e; // 6014
+/** InvalidStatus: Submission status is invalid for this operation */
+export const VAULT_ERROR__INVALID_STATUS = 0x177f; // 6015
+/** ReviewDeadlinePassed: Review deadline has already passed */
+export const VAULT_ERROR__REVIEW_DEADLINE_PASSED = 0x1780; // 6016
+/** ReviewDeadlineNotReached: Review deadline has not been reached yet */
+export const VAULT_ERROR__REVIEW_DEADLINE_NOT_REACHED = 0x1781; // 6017
+/** AppealWindowClosed: Appeal window has closed */
+export const VAULT_ERROR__APPEAL_WINDOW_CLOSED = 0x1782; // 6018
+/** AlreadyAppealed: Submission has already been appealed */
+export const VAULT_ERROR__ALREADY_APPEALED = 0x1783; // 6019
+/** BaselineMissing: Baseline views have not been established yet */
+export const VAULT_ERROR__BASELINE_MISSING = 0x1784; // 6020
+/** ReportReplay: Report timestamp must be strictly newer than previous report */
+export const VAULT_ERROR__REPORT_REPLAY = 0x1785; // 6021
+/** ViewsDecreased: Reported view count cannot decrease */
+export const VAULT_ERROR__VIEWS_DECREASED = 0x1786; // 6022
+/** ReportFromFuture: Report timestamp is in the future */
+export const VAULT_ERROR__REPORT_FROM_FUTURE = 0x1787; // 6023
+/** ReportBeforeSubmission: Report timestamp is before submission timestamp */
+export const VAULT_ERROR__REPORT_BEFORE_SUBMISSION = 0x1788; // 6024
+/** ReportAfterEnd: Non-final report cannot be dated after campaign end time */
+export const VAULT_ERROR__REPORT_AFTER_END = 0x1789; // 6025
+/** FinalOutsideWindow: Final report must be within final snapshot tolerance window */
+export const VAULT_ERROR__FINAL_OUTSIDE_WINDOW = 0x178a; // 6026
+/** FinalAlreadyReceived: Final report has already been accepted */
+export const VAULT_ERROR__FINAL_ALREADY_RECEIVED = 0x178b; // 6027
+/** FinalBeforeBaseline: Cannot submit final report before baseline views are established */
+export const VAULT_ERROR__FINAL_BEFORE_BASELINE = 0x178c; // 6028
+/** InvalidReporter: Report reporter does not match current configured oracle */
+export const VAULT_ERROR__INVALID_REPORTER = 0x178d; // 6029
+/** ReportTooOld: Report is too old; fresh oracle report required */
+export const VAULT_ERROR__REPORT_TOO_OLD = 0x178e; // 6030
+/** FinalReportPending: Final report is pending from oracle */
+export const VAULT_ERROR__FINAL_REPORT_PENDING = 0x178f; // 6031
+/** SettlementOver: Settlement period has already ended */
+export const VAULT_ERROR__SETTLEMENT_OVER = 0x1790; // 6032
+/** SettlementNotOver: Settlement period has not ended yet */
+export const VAULT_ERROR__SETTLEMENT_NOT_OVER = 0x1791; // 6033
+/** NothingToClaim: Nothing to claim */
+export const VAULT_ERROR__NOTHING_TO_CLAIM = 0x1792; // 6034
+/** PoolEmpty: Campaign pool is empty */
+export const VAULT_ERROR__POOL_EMPTY = 0x1793; // 6035
+/** MathOverflow: Math overflow encountered */
+export const VAULT_ERROR__MATH_OVERFLOW = 0x1794; // 6036
 
 export type VaultError =
-  typeof VAULT_ERROR__INVALID_AMOUNT | typeof VAULT_ERROR__VAULT_ALREADY_EXISTS;
+  | typeof VAULT_ERROR__ALREADY_APPEALED
+  | typeof VAULT_ERROR__APPEAL_WINDOW_CLOSED
+  | typeof VAULT_ERROR__BASELINE_MISSING
+  | typeof VAULT_ERROR__CAMPAIGN_CLOSED
+  | typeof VAULT_ERROR__CAMPAIGN_NOT_ACTIVE
+  | typeof VAULT_ERROR__CAMPAIGN_NOT_FUNDED
+  | typeof VAULT_ERROR__CONFIG_ALREADY_INITIALIZED
+  | typeof VAULT_ERROR__FINAL_ALREADY_RECEIVED
+  | typeof VAULT_ERROR__FINAL_BEFORE_BASELINE
+  | typeof VAULT_ERROR__FINAL_OUTSIDE_WINDOW
+  | typeof VAULT_ERROR__FINAL_REPORT_PENDING
+  | typeof VAULT_ERROR__INVALID_MINT
+  | typeof VAULT_ERROR__INVALID_PARAMS
+  | typeof VAULT_ERROR__INVALID_REPORTER
+  | typeof VAULT_ERROR__INVALID_STATUS
+  | typeof VAULT_ERROR__MATH_OVERFLOW
+  | typeof VAULT_ERROR__NOT_ADMIN
+  | typeof VAULT_ERROR__NOT_CLIPPER
+  | typeof VAULT_ERROR__NOT_CREATOR
+  | typeof VAULT_ERROR__NOTHING_TO_CLAIM
+  | typeof VAULT_ERROR__NOT_ORACLE
+  | typeof VAULT_ERROR__NOT_UPGRADE_AUTHORITY
+  | typeof VAULT_ERROR__OUTSIDE_CAMPAIGN_PERIOD
+  | typeof VAULT_ERROR__POOL_EMPTY
+  | typeof VAULT_ERROR__QUOTA_EXCEEDED
+  | typeof VAULT_ERROR__REPORT_AFTER_END
+  | typeof VAULT_ERROR__REPORT_BEFORE_SUBMISSION
+  | typeof VAULT_ERROR__REPORT_FROM_FUTURE
+  | typeof VAULT_ERROR__REPORT_REPLAY
+  | typeof VAULT_ERROR__REPORT_TOO_OLD
+  | typeof VAULT_ERROR__REVIEW_DEADLINE_NOT_REACHED
+  | typeof VAULT_ERROR__REVIEW_DEADLINE_PASSED
+  | typeof VAULT_ERROR__SELF_SUBMISSION
+  | typeof VAULT_ERROR__SETTLEMENT_NOT_OVER
+  | typeof VAULT_ERROR__SETTLEMENT_OVER
+  | typeof VAULT_ERROR__TOTAL_QUOTA_EXCEEDED
+  | typeof VAULT_ERROR__VIEWS_DECREASED;
 
 let vaultErrorMessages: Record<VaultError, string> | undefined;
 if (process.env.NODE_ENV !== "production") {
   vaultErrorMessages = {
-    [VAULT_ERROR__INVALID_AMOUNT]: `Invalid amount`,
-    [VAULT_ERROR__VAULT_ALREADY_EXISTS]: `Vault already exists`,
+    [VAULT_ERROR__ALREADY_APPEALED]: `Submission has already been appealed`,
+    [VAULT_ERROR__APPEAL_WINDOW_CLOSED]: `Appeal window has closed`,
+    [VAULT_ERROR__BASELINE_MISSING]: `Baseline views have not been established yet`,
+    [VAULT_ERROR__CAMPAIGN_CLOSED]: `Campaign is already closed`,
+    [VAULT_ERROR__CAMPAIGN_NOT_ACTIVE]: `Campaign is not active`,
+    [VAULT_ERROR__CAMPAIGN_NOT_FUNDED]: `Campaign is not funded`,
+    [VAULT_ERROR__CONFIG_ALREADY_INITIALIZED]: `Config account already initialized`,
+    [VAULT_ERROR__FINAL_ALREADY_RECEIVED]: `Final report has already been accepted`,
+    [VAULT_ERROR__FINAL_BEFORE_BASELINE]: `Cannot submit final report before baseline views are established`,
+    [VAULT_ERROR__FINAL_OUTSIDE_WINDOW]: `Final report must be within final snapshot tolerance window`,
+    [VAULT_ERROR__FINAL_REPORT_PENDING]: `Final report is pending from oracle`,
+    [VAULT_ERROR__INVALID_MINT]: `Invalid token mint`,
+    [VAULT_ERROR__INVALID_PARAMS]: `Invalid parameters provided`,
+    [VAULT_ERROR__INVALID_REPORTER]: `Report reporter does not match current configured oracle`,
+    [VAULT_ERROR__INVALID_STATUS]: `Submission status is invalid for this operation`,
+    [VAULT_ERROR__MATH_OVERFLOW]: `Math overflow encountered`,
+    [VAULT_ERROR__NOT_ADMIN]: `Signer is not admin`,
+    [VAULT_ERROR__NOT_CLIPPER]: `Signer is not clipper`,
+    [VAULT_ERROR__NOT_CREATOR]: `Signer is not creator`,
+    [VAULT_ERROR__NOTHING_TO_CLAIM]: `Nothing to claim`,
+    [VAULT_ERROR__NOT_ORACLE]: `Signer is not authorized oracle`,
+    [VAULT_ERROR__NOT_UPGRADE_AUTHORITY]: `Signer is not program upgrade authority`,
+    [VAULT_ERROR__OUTSIDE_CAMPAIGN_PERIOD]: `Outside allowed campaign period`,
+    [VAULT_ERROR__POOL_EMPTY]: `Campaign pool is empty`,
+    [VAULT_ERROR__QUOTA_EXCEEDED]: `Active video quota reached for clipper`,
+    [VAULT_ERROR__REPORT_AFTER_END]: `Non-final report cannot be dated after campaign end time`,
+    [VAULT_ERROR__REPORT_BEFORE_SUBMISSION]: `Report timestamp is before submission timestamp`,
+    [VAULT_ERROR__REPORT_FROM_FUTURE]: `Report timestamp is in the future`,
+    [VAULT_ERROR__REPORT_REPLAY]: `Report timestamp must be strictly newer than previous report`,
+    [VAULT_ERROR__REPORT_TOO_OLD]: `Report is too old; fresh oracle report required`,
+    [VAULT_ERROR__REVIEW_DEADLINE_NOT_REACHED]: `Review deadline has not been reached yet`,
+    [VAULT_ERROR__REVIEW_DEADLINE_PASSED]: `Review deadline has already passed`,
+    [VAULT_ERROR__SELF_SUBMISSION]: `Creator cannot submit to own campaign`,
+    [VAULT_ERROR__SETTLEMENT_NOT_OVER]: `Settlement period has not ended yet`,
+    [VAULT_ERROR__SETTLEMENT_OVER]: `Settlement period has already ended`,
+    [VAULT_ERROR__TOTAL_QUOTA_EXCEEDED]: `Total submission quota reached for clipper`,
+    [VAULT_ERROR__VIEWS_DECREASED]: `Reported view count cannot decrease`,
   };
 }
 

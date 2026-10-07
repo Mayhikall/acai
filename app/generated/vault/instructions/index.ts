@@ -6,5 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./deposit";
-export * from "./withdraw";
+export * from "./acceptAdmin";
+export * from "./acceptSubmission";
+export * from "./appealSubmission";
+export * from "./claim";
+export * from "./closeReport";
+export * from "./closeStats";
+export * from "./closeSubmission";
+export * from "./closeUnfunded";
+export * from "./finalizeTimeout";
+export * from "./fundCampaign";
+export * from "./initializeCampaign";
+export * from "./initializeConfig";
+export * from "./proposeAdmin";
+export * from "./refund";
+export * from "./registerSubmission";
+export * from "./rejectSubmission";
+export * from "./submitOracleReport";
+export * from "./topUp";
+export * from "./updateOracle";

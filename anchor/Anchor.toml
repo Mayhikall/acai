@@ -9,7 +9,7 @@ vault = "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy"
 
 [provider]
 cluster = "devnet"
-wallet = "~/.config/solana/id.json"
+wallet = "~/phantom-solana.json"
 
 [scripts]
 test = "cargo test"

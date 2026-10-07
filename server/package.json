@@ -1,0 +1,43 @@
+{
+  "name": "acai-server",
+  "version": "1.0.0",
+  "description": "Acai API, YouTube integration, and oracle orchestration",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "migrate": "knex --knexfile src/db/knexfile.js migrate:latest",
+    "migrate:rollback": "knex --knexfile src/db/knexfile.js migrate:rollback",
+    "check": "node --check src/index.js",
+    "test": "node --test",
+    "seed": "knex --knexfile src/db/knexfile.js seed:run",
+    "test:youtube": "node scripts/youtube-smoke.js",
+    "test:e2e": "node scripts/backend-e2e.js",
+    "init:config": "node scripts/initialize-config.js",
+    "env:check": "node scripts/check-env.js"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/kit": "^6.10.0",
+    "@solana/web3.js": "^1.99.0",
+    "@supabase/supabase-js": "^2.117.2",
+    "bs58": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.7.1",
+    "googleapis": "^183.0.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
+    "multer": "^2.4.0",
+    "pg": "^8.13.1",
+    "pino-http": "^10.5.0",
+    "tweetnacl": "^1.0.3",
+    "zod": "^3.25.76"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20.18"
+  }
+}

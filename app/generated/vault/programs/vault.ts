@@ -17,18 +17,141 @@ import {
   type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
-  parseDepositInstruction,
-  parseWithdrawInstruction,
-  type ParsedDepositInstruction,
-  type ParsedWithdrawInstruction,
+  parseAcceptAdminInstruction,
+  parseAcceptSubmissionInstruction,
+  parseAppealSubmissionInstruction,
+  parseClaimInstruction,
+  parseCloseReportInstruction,
+  parseCloseStatsInstruction,
+  parseCloseSubmissionInstruction,
+  parseCloseUnfundedInstruction,
+  parseFinalizeTimeoutInstruction,
+  parseFundCampaignInstruction,
+  parseInitializeCampaignInstruction,
+  parseInitializeConfigInstruction,
+  parseProposeAdminInstruction,
+  parseRefundInstruction,
+  parseRegisterSubmissionInstruction,
+  parseRejectSubmissionInstruction,
+  parseSubmitOracleReportInstruction,
+  parseTopUpInstruction,
+  parseUpdateOracleInstruction,
+  type ParsedAcceptAdminInstruction,
+  type ParsedAcceptSubmissionInstruction,
+  type ParsedAppealSubmissionInstruction,
+  type ParsedClaimInstruction,
+  type ParsedCloseReportInstruction,
+  type ParsedCloseStatsInstruction,
+  type ParsedCloseSubmissionInstruction,
+  type ParsedCloseUnfundedInstruction,
+  type ParsedFinalizeTimeoutInstruction,
+  type ParsedFundCampaignInstruction,
+  type ParsedInitializeCampaignInstruction,
+  type ParsedInitializeConfigInstruction,
+  type ParsedProposeAdminInstruction,
+  type ParsedRefundInstruction,
+  type ParsedRegisterSubmissionInstruction,
+  type ParsedRejectSubmissionInstruction,
+  type ParsedSubmitOracleReportInstruction,
+  type ParsedTopUpInstruction,
+  type ParsedUpdateOracleInstruction,
 } from "../instructions";
 
 export const VAULT_PROGRAM_ADDRESS =
   "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy" as Address<"5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy">;
 
+export enum VaultAccount {
+  Campaign,
+  ClipperStats,
+  Config,
+  OracleReport,
+  Submission,
+}
+
+export function identifyVaultAccount(
+  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
+): VaultAccount {
+  const data = "data" in account ? account.data : account;
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([50, 40, 49, 11, 157, 220, 229, 192]),
+      ),
+      0,
+    )
+  ) {
+    return VaultAccount.Campaign;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([46, 200, 103, 103, 49, 157, 72, 139]),
+      ),
+      0,
+    )
+  ) {
+    return VaultAccount.ClipperStats;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([155, 12, 170, 224, 30, 250, 204, 130]),
+      ),
+      0,
+    )
+  ) {
+    return VaultAccount.Config;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([72, 98, 174, 167, 90, 119, 146, 220]),
+      ),
+      0,
+    )
+  ) {
+    return VaultAccount.OracleReport;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([58, 194, 159, 158, 75, 102, 178, 197]),
+      ),
+      0,
+    )
+  ) {
+    return VaultAccount.Submission;
+  }
+  throw new Error(
+    "The provided account could not be identified as a vault account.",
+  );
+}
+
 export enum VaultInstruction {
-  Deposit,
-  Withdraw,
+  AcceptAdmin,
+  AcceptSubmission,
+  AppealSubmission,
+  Claim,
+  CloseReport,
+  CloseStats,
+  CloseSubmission,
+  CloseUnfunded,
+  FinalizeTimeout,
+  FundCampaign,
+  InitializeCampaign,
+  InitializeConfig,
+  ProposeAdmin,
+  Refund,
+  RegisterSubmission,
+  RejectSubmission,
+  SubmitOracleReport,
+  TopUp,
+  UpdateOracle,
 }
 
 export function identifyVaultInstruction(
@@ -39,23 +162,210 @@ export function identifyVaultInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([242, 35, 198, 137, 82, 225, 242, 182]),
+        new Uint8Array([112, 42, 45, 90, 116, 181, 13, 170]),
       ),
       0,
     )
   ) {
-    return VaultInstruction.Deposit;
+    return VaultInstruction.AcceptAdmin;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([183, 18, 70, 156, 148, 109, 161, 34]),
+        new Uint8Array([65, 133, 222, 91, 162, 82, 229, 203]),
       ),
       0,
     )
   ) {
-    return VaultInstruction.Withdraw;
+    return VaultInstruction.AcceptSubmission;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([159, 42, 14, 135, 8, 135, 128, 150]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.AppealSubmission;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([62, 198, 214, 193, 213, 159, 108, 210]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.Claim;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([110, 5, 130, 2, 12, 239, 166, 51]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.CloseReport;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([174, 17, 184, 167, 73, 29, 255, 61]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.CloseStats;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([204, 237, 166, 65, 57, 7, 11, 105]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.CloseSubmission;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([6, 217, 112, 91, 250, 92, 103, 70]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.CloseUnfunded;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([112, 138, 236, 182, 22, 98, 125, 25]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.FinalizeTimeout;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([109, 57, 56, 239, 99, 111, 221, 121]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.FundCampaign;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([169, 88, 7, 6, 9, 165, 65, 132]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.InitializeCampaign;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([208, 127, 21, 1, 194, 190, 196, 70]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.InitializeConfig;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([121, 214, 199, 212, 87, 39, 117, 234]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.ProposeAdmin;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([2, 96, 183, 251, 63, 208, 46, 46]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.Refund;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([55, 137, 111, 27, 8, 157, 187, 218]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.RegisterSubmission;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([2, 92, 1, 81, 148, 156, 6, 160]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.RejectSubmission;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([141, 255, 247, 6, 153, 214, 17, 103]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.SubmitOracleReport;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([236, 225, 96, 9, 60, 106, 77, 208]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.TopUp;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([112, 41, 209, 18, 248, 226, 252, 188]),
+      ),
+      0,
+    )
+  ) {
+    return VaultInstruction.UpdateOracle;
   }
   throw new Error(
     "The provided instruction could not be identified as a vault instruction.",
@@ -66,29 +376,199 @@ export type ParsedVaultInstruction<
   TProgram extends string = "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy",
 > =
   | ({
-      instructionType: VaultInstruction.Deposit;
-    } & ParsedDepositInstruction<TProgram>)
+      instructionType: VaultInstruction.AcceptAdmin;
+    } & ParsedAcceptAdminInstruction<TProgram>)
   | ({
-      instructionType: VaultInstruction.Withdraw;
-    } & ParsedWithdrawInstruction<TProgram>);
+      instructionType: VaultInstruction.AcceptSubmission;
+    } & ParsedAcceptSubmissionInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.AppealSubmission;
+    } & ParsedAppealSubmissionInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.Claim;
+    } & ParsedClaimInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.CloseReport;
+    } & ParsedCloseReportInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.CloseStats;
+    } & ParsedCloseStatsInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.CloseSubmission;
+    } & ParsedCloseSubmissionInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.CloseUnfunded;
+    } & ParsedCloseUnfundedInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.FinalizeTimeout;
+    } & ParsedFinalizeTimeoutInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.FundCampaign;
+    } & ParsedFundCampaignInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.InitializeCampaign;
+    } & ParsedInitializeCampaignInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.InitializeConfig;
+    } & ParsedInitializeConfigInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.ProposeAdmin;
+    } & ParsedProposeAdminInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.Refund;
+    } & ParsedRefundInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.RegisterSubmission;
+    } & ParsedRegisterSubmissionInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.RejectSubmission;
+    } & ParsedRejectSubmissionInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.SubmitOracleReport;
+    } & ParsedSubmitOracleReportInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.TopUp;
+    } & ParsedTopUpInstruction<TProgram>)
+  | ({
+      instructionType: VaultInstruction.UpdateOracle;
+    } & ParsedUpdateOracleInstruction<TProgram>);
 
 export function parseVaultInstruction<TProgram extends string>(
   instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
 ): ParsedVaultInstruction<TProgram> {
   const instructionType = identifyVaultInstruction(instruction);
   switch (instructionType) {
-    case VaultInstruction.Deposit: {
+    case VaultInstruction.AcceptAdmin: {
       assertIsInstructionWithAccounts(instruction);
       return {
-        instructionType: VaultInstruction.Deposit,
-        ...parseDepositInstruction(instruction),
+        instructionType: VaultInstruction.AcceptAdmin,
+        ...parseAcceptAdminInstruction(instruction),
       };
     }
-    case VaultInstruction.Withdraw: {
+    case VaultInstruction.AcceptSubmission: {
       assertIsInstructionWithAccounts(instruction);
       return {
-        instructionType: VaultInstruction.Withdraw,
-        ...parseWithdrawInstruction(instruction),
+        instructionType: VaultInstruction.AcceptSubmission,
+        ...parseAcceptSubmissionInstruction(instruction),
+      };
+    }
+    case VaultInstruction.AppealSubmission: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.AppealSubmission,
+        ...parseAppealSubmissionInstruction(instruction),
+      };
+    }
+    case VaultInstruction.Claim: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.Claim,
+        ...parseClaimInstruction(instruction),
+      };
+    }
+    case VaultInstruction.CloseReport: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.CloseReport,
+        ...parseCloseReportInstruction(instruction),
+      };
+    }
+    case VaultInstruction.CloseStats: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.CloseStats,
+        ...parseCloseStatsInstruction(instruction),
+      };
+    }
+    case VaultInstruction.CloseSubmission: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.CloseSubmission,
+        ...parseCloseSubmissionInstruction(instruction),
+      };
+    }
+    case VaultInstruction.CloseUnfunded: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.CloseUnfunded,
+        ...parseCloseUnfundedInstruction(instruction),
+      };
+    }
+    case VaultInstruction.FinalizeTimeout: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.FinalizeTimeout,
+        ...parseFinalizeTimeoutInstruction(instruction),
+      };
+    }
+    case VaultInstruction.FundCampaign: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.FundCampaign,
+        ...parseFundCampaignInstruction(instruction),
+      };
+    }
+    case VaultInstruction.InitializeCampaign: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.InitializeCampaign,
+        ...parseInitializeCampaignInstruction(instruction),
+      };
+    }
+    case VaultInstruction.InitializeConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.InitializeConfig,
+        ...parseInitializeConfigInstruction(instruction),
+      };
+    }
+    case VaultInstruction.ProposeAdmin: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.ProposeAdmin,
+        ...parseProposeAdminInstruction(instruction),
+      };
+    }
+    case VaultInstruction.Refund: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.Refund,
+        ...parseRefundInstruction(instruction),
+      };
+    }
+    case VaultInstruction.RegisterSubmission: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.RegisterSubmission,
+        ...parseRegisterSubmissionInstruction(instruction),
+      };
+    }
+    case VaultInstruction.RejectSubmission: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.RejectSubmission,
+        ...parseRejectSubmissionInstruction(instruction),
+      };
+    }
+    case VaultInstruction.SubmitOracleReport: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.SubmitOracleReport,
+        ...parseSubmitOracleReportInstruction(instruction),
+      };
+    }
+    case VaultInstruction.TopUp: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.TopUp,
+        ...parseTopUpInstruction(instruction),
+      };
+    }
+    case VaultInstruction.UpdateOracle: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VaultInstruction.UpdateOracle,
+        ...parseUpdateOracleInstruction(instruction),
       };
     }
     default:

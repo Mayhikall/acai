@@ -1,0 +1,20 @@
+{
+  "channel": {
+    "channelId": "UC_MOCK_CHANNEL_123",
+    "title": "Acai Demo Clipper",
+    "subscriberCount": 2500,
+    "channelCreatedAt": "2023-01-01T00:00:00.000Z"
+  },
+  "videos": [
+    {
+      "videoId": "dQw4w9WgXcQ",
+      "channelId": "UC_MOCK_CHANNEL_123",
+      "title": "Acai demo clip",
+      "description": "A short demo clip mentioning @acai_creator_podcast",
+      "publishedAtOffsetSeconds": -3600,
+      "durationSeconds": 58,
+      "availability": "public",
+      "viewCount": 1000
+    }
+  ]
+}

@@ -1,6 +1,14 @@
 use anchor_lang::prelude::*;
-use anchor_lang::system_program::{transfer, Transfer};
 
+pub mod errors;
+pub mod events;
+pub mod instructions;
+pub mod state;
+
+use instructions::*;
+
+#[cfg(test)]
+mod runtime_tests;
 #[cfg(test)]
 mod tests;
 
@@ -10,66 +18,100 @@ declare_id!("5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy");
 pub mod vault {
     use super::*;
 
-    pub fn deposit(ctx: Context<VaultAction>, amount: u64) -> Result<()> {
-        require!(ctx.accounts.vault.lamports() == 0, VaultError::VaultAlreadyExists);
-
-        let rent = Rent::get()?.minimum_balance(0);
-        require!(amount > rent, VaultError::InvalidAmount);
-
-        transfer(
-            CpiContext::new(
-                System::id(),
-                Transfer {
-                    from: ctx.accounts.signer.to_account_info(),
-                    to: ctx.accounts.vault.to_account_info(),
-                },
-            ),
-            amount,
-        )?;
-
-        Ok(())
+    // Config governance
+    pub fn initialize_config(
+        ctx: Context<InitializeConfig>,
+        admin: Pubkey,
+        oracle: Pubkey,
+    ) -> Result<()> {
+        instructions::handle_initialize_config(ctx, admin, oracle)
     }
 
-    pub fn withdraw(ctx: Context<VaultAction>) -> Result<()> {
-        require!(ctx.accounts.vault.lamports() > 0, VaultError::InvalidAmount);
-
-        let bump = ctx.bumps.vault;
-        let signer_key = ctx.accounts.signer.key();
-        let signer_seeds: &[&[&[u8]]] = &[&[b"vault", signer_key.as_ref(), &[bump]]];
-
-        transfer(
-            CpiContext::new_with_signer(
-                System::id(),
-                Transfer {
-                    from: ctx.accounts.vault.to_account_info(),
-                    to: ctx.accounts.signer.to_account_info(),
-                },
-                signer_seeds,
-            ),
-            ctx.accounts.vault.lamports(),
-        )?;
-
-        Ok(())
+    pub fn update_oracle(ctx: Context<UpdateOracle>, new_oracle: Pubkey) -> Result<()> {
+        instructions::handle_update_oracle(ctx, new_oracle)
     }
-}
 
-#[derive(Accounts)]
-pub struct VaultAction<'info> {
-    #[account(mut)]
-    pub signer: Signer<'info>,
-    #[account(
-        mut,
-        seeds = [b"vault", signer.key().as_ref()],
-        bump,
-    )]
-    pub vault: SystemAccount<'info>,
-    pub system_program: Program<'info, System>,
-}
+    pub fn propose_admin(ctx: Context<ProposeAdmin>, new_admin: Pubkey) -> Result<()> {
+        instructions::handle_propose_admin(ctx, new_admin)
+    }
 
-#[error_code]
-pub enum VaultError {
-    #[msg("Vault already exists")]
-    VaultAlreadyExists,
-    #[msg("Invalid amount")]
-    InvalidAmount,
+    pub fn accept_admin(ctx: Context<AcceptAdmin>) -> Result<()> {
+        instructions::handle_accept_admin(ctx)
+    }
+
+    // Campaign lifecycle
+    pub fn initialize_campaign(
+        ctx: Context<InitializeCampaign>,
+        params: InitializeCampaignParams,
+    ) -> Result<()> {
+        instructions::handle_initialize_campaign(ctx, params)
+    }
+
+    pub fn fund_campaign(ctx: Context<FundCampaign>) -> Result<()> {
+        instructions::handle_fund_campaign(ctx)
+    }
+
+    pub fn top_up(ctx: Context<TopUp>, amount: u64) -> Result<()> {
+        instructions::handle_top_up(ctx, amount)
+    }
+
+    pub fn close_unfunded(ctx: Context<CloseUnfunded>) -> Result<()> {
+        instructions::handle_close_unfunded(ctx)
+    }
+
+    // Submission lifecycle
+    pub fn register_submission(
+        ctx: Context<RegisterSubmission>,
+        video_id: String,
+        terms_hash: [u8; 32],
+    ) -> Result<()> {
+        instructions::handle_register_submission(ctx, video_id, terms_hash)
+    }
+
+    pub fn accept_submission(ctx: Context<ReviewSubmission>) -> Result<()> {
+        instructions::handle_accept_submission(ctx)
+    }
+
+    pub fn reject_submission(ctx: Context<ReviewSubmission>, reason_hash: [u8; 32]) -> Result<()> {
+        instructions::handle_reject_submission(ctx, reason_hash)
+    }
+
+    pub fn appeal_submission(ctx: Context<AppealSubmission>) -> Result<()> {
+        instructions::handle_appeal_submission(ctx)
+    }
+
+    pub fn finalize_timeout(ctx: Context<FinalizeTimeout>) -> Result<()> {
+        instructions::handle_finalize_timeout(ctx)
+    }
+
+    // Oracle
+    pub fn submit_oracle_report(
+        ctx: Context<SubmitOracleReport>,
+        view_count: u64,
+        fetched_at: i64,
+        is_final: bool,
+    ) -> Result<()> {
+        instructions::handle_submit_oracle_report(ctx, view_count, fetched_at, is_final)
+    }
+
+    // Claim, Refund, Cleanup
+    pub fn claim(ctx: Context<Claim>) -> Result<()> {
+        instructions::handle_claim(ctx)
+    }
+
+    pub fn refund(ctx: Context<Refund>) -> Result<()> {
+        instructions::handle_refund(ctx)
+    }
+
+    pub fn close_report(ctx: Context<CloseReport>) -> Result<()> {
+        instructions::handle_close_report(ctx)
+    }
+
+    pub fn close_submission(ctx: Context<CloseSubmission>) -> Result<()> {
+        instructions::handle_close_submission(ctx)
+    }
+
+    pub fn close_stats(ctx: Context<CloseStats>) -> Result<()> {
+        instructions::handle_close_stats(ctx)
+    }
 }

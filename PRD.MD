@@ -2,18 +2,18 @@
 
 Revisi dari v3. Arah produk tidak berubah; v4 menutup inkonsistensi dan celah yang ditemukan saat review v3.
 
-| # | Perubahan | Section |
-| --- | --- | --- |
-| 1 | **Rotasi oracle**: report final/replay dibandingkan hanya dengan report dari oracle saat ini, sehingga final dari key lama dapat diganti oracle baru (sebelumnya terkunci oleh `FinalAlreadyReceived`) | 7.4, 7.7, 10.7 |
-| 2 | **claim-request** tidak lagi ditolak karena "tidak ada views baru" (bertentangan dengan Claim 4 di skenario angka); ditolak hanya bila tidak ada sisa klaim | 11.2 |
-| 3 | Aturan `active_count` untuk jalur appeal dirumuskan eksplisit (reject awal, appeal, reject final) | 10.2 |
-| 4 | `close_report`/`close_submission`/`close_stats` boleh setelah settlement berakhir, tidak bergantung pada creator memanggil `refund()` | 9.1, 10.2, 10.8 |
-| 5 | Sanity check: cold start tanpa riwayat, profil threshold demo (agar lonjakan views demo tidak tertahan), perilaku saat baseline/claim-request `held` | 7.4, 11.2, 14 |
-| 6 | Jendela toleransi final dicantumkan di Terms (sebelumnya hanya disebut "dicantumkan") | 3 |
-| 7 | Urutan demo diperbaiki: verifikasi → register → baseline → accept | 14 |
-| 8 | Oracle Worker tidak mengirim report untuk REJECTED tanpa appeal setelah `appeal_window`; `report_seq` dinaikkan program | 7.3, 7.6 |
-| 9 | Aturan accept/reject saat appeal dirumuskan eksplisit | 10.2 |
-| 10 | Rencana testing diperluas untuk perubahan di atas | 17 |
+| #   | Perubahan                                                                                                                                                                                              | Section         |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
+| 1   | **Rotasi oracle**: report final/replay dibandingkan hanya dengan report dari oracle saat ini, sehingga final dari key lama dapat diganti oracle baru (sebelumnya terkunci oleh `FinalAlreadyReceived`) | 7.4, 7.7, 10.7  |
+| 2   | **claim-request** tidak lagi ditolak karena "tidak ada views baru" (bertentangan dengan Claim 4 di skenario angka); ditolak hanya bila tidak ada sisa klaim                                            | 11.2            |
+| 3   | Aturan `active_count` untuk jalur appeal dirumuskan eksplisit (reject awal, appeal, reject final)                                                                                                      | 10.2            |
+| 4   | `close_report`/`close_submission`/`close_stats` boleh setelah settlement berakhir, tidak bergantung pada creator memanggil `refund()`                                                                  | 9.1, 10.2, 10.8 |
+| 5   | Sanity check: cold start tanpa riwayat, profil threshold demo (agar lonjakan views demo tidak tertahan), perilaku saat baseline/claim-request `held`                                                   | 7.4, 11.2, 14   |
+| 6   | Jendela toleransi final dicantumkan di Terms (sebelumnya hanya disebut "dicantumkan")                                                                                                                  | 3               |
+| 7   | Urutan demo diperbaiki: verifikasi → register → baseline → accept                                                                                                                                      | 14              |
+| 8   | Oracle Worker tidak mengirim report untuk REJECTED tanpa appeal setelah `appeal_window`; `report_seq` dinaikkan program                                                                                | 7.3, 7.6        |
+| 9   | Aturan accept/reject saat appeal dirumuskan eksplisit                                                                                                                                                  | 10.2            |
+| 10  | Rencana testing diperluas untuk perubahan di atas                                                                                                                                                      | 17              |
 
 ---
 
@@ -142,16 +142,16 @@ Wewenang admin hanya mengganti oracle dan memindahkan peran admin. Admin **tidak
 
 Semua parameter disimpan saat `initialize_campaign()`, bukan konstanta, sehingga flow review, appeal, dan settlement dapat didemokan di devnet dalam hitungan menit.
 
-| Parameter | Default produksi | Default demo (devnet) |
-| --- | --- | --- |
-| `review_period` (batas review awal) | 3 hari | 3 menit |
-| `appeal_window` (batas appeal sejak rejection) | 2 hari | 2 menit |
-| `appeal_timeout` (batas creator merespons appeal) | 3 hari | 3 menit |
-| `settlement_period` (claim setelah end\_time) | 7 hari | 3 menit |
-| `max_report_age` (umur maksimum report saat claim) | 24 jam | 10 menit |
-| `final_snapshot_tolerance` (jendela ± terhadap end\_time) | 1 jam | 1 menit |
-| `clock_skew_tolerance` (selisih jam oracle vs on-chain yang ditoleransi) | 30 detik | 10 detik |
-| `max_videos_per_clipper` (submission aktif) | 5 | 5 |
+| Parameter                                                                | Default produksi | Default demo (devnet) |
+| ------------------------------------------------------------------------ | ---------------- | --------------------- |
+| `review_period` (batas review awal)                                      | 3 hari           | 3 menit               |
+| `appeal_window` (batas appeal sejak rejection)                           | 2 hari           | 2 menit               |
+| `appeal_timeout` (batas creator merespons appeal)                        | 3 hari           | 3 menit               |
+| `settlement_period` (claim setelah end\_time)                            | 7 hari           | 3 menit               |
+| `max_report_age` (umur maksimum report saat claim)                       | 24 jam           | 10 menit              |
+| `final_snapshot_tolerance` (jendela ± terhadap end\_time)                | 1 jam            | 1 menit               |
+| `clock_skew_tolerance` (selisih jam oracle vs on-chain yang ditoleransi) | 30 detik         | 10 detik              |
+| `max_videos_per_clipper` (submission aktif)                              | 5                | 5                     |
 
 Batas total submission per clipper (termasuk yang ditolak) = 2 × `max_videos_per_clipper` (Section 10.2).
 
@@ -222,7 +222,7 @@ Final Decision oleh Creator
 
 **Alasan penolakan.** `reject_submission()` menerima `reason_hash` (SHA-256 teks alasan). Teks alasan disimpan di `review_actions` (off-chain) dan ditampilkan ke clipper. Ini memberi jejak audit atas penolakan tanpa alasan.
 
-**Notifikasi.** Karena auto-accept berarti creator yang lalai menanggung akibatnya, sistem mengirim notifikasi in-app dan email (bila diisi) untuk: submission baru, pengingat mendekati `review_deadline` (misalnya 24 jam dan 1 jam sebelumnya; skala proporsional pada parameter demo), hasil review, appeal masuk, dan hasil appeal. Notifikasi tidak memengaruhi aturan on-chain.
+**Notifikasi.** Karena auto-accept berarti creator yang lalai menanggung akibatnya, sistem mengirim notifikasi in-app untuk: submission baru, pengingat mendekati `review_deadline` (misalnya 24 jam dan 1 jam sebelumnya; skala proporsional pada parameter demo), hasil review, appeal masuk, dan hasil appeal. Notifikasi tidak memengaruhi aturan on-chain.
 
 **Trade-off yang disadari:** final decision appeal dibuat oleh Creator yang sama dengan reviewer awal, sehingga appeal efektif terutama lewat `finalize_timeout()`. Mekanisme dispute independen ada di luar scope MVP.
 
@@ -327,11 +327,11 @@ Views setelah `end_time` pada dasarnya tidak menghasilkan reward, sementara clai
 
 Aturan `claim()` saat `now > end_time` (report yang dipakai harus berasal dari oracle saat ini, Section 7.7):
 
-| Kondisi | Hasil |
-| --- | --- |
-| Report final ada | dipakai |
-| Belum ada final, `now <= end_time + tolerance` | ditolak `FinalReportPending` (menunggu oracle) |
-| Belum ada final, `now > end_time + tolerance` | fallback: dipakai report non-final terakhir (selalu `fetched_at <= end_time`, tanpa syarat `max_report_age`) |
+| Kondisi                                        | Hasil                                                                                                        |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Report final ada                               | dipakai                                                                                                      |
+| Belum ada final, `now <= end_time + tolerance` | ditolak `FinalReportPending` (menunggu oracle)                                                               |
+| Belum ada final, `now > end_time + tolerance`  | fallback: dipakai report non-final terakhir (selalu `fetched_at <= end_time`, tanpa syarat `max_report_age`) |
 
 Fallback mencegah claim terkunci permanen jika oracle gagal pada jendela final. Dampaknya konservatif: views antara report terakhir dan `end_time` tidak dibayar.
 
@@ -395,12 +395,12 @@ Status yang disimpan on-chain: `PENDING_FUNDING`, `FUNDED`, `CLOSED`. Status `SE
 PENDING_FUNDING → FUNDED(ACTIVE) → SETTLEMENT → CLOSED
 ```
 
-| Kondisi | Status efektif |
-| --- | --- |
-| setelah `initialize_campaign()`, belum `fund_campaign()` | PENDING\_FUNDING |
-| funded dan `now <= end_time` | ACTIVE |
-| funded dan `end_time < now <= end_time + settlement_period` | SETTLEMENT |
-| `refund()` sudah dipanggil | CLOSED |
+| Kondisi                                                     | Status efektif   |
+| ----------------------------------------------------------- | ---------------- |
+| setelah `initialize_campaign()`, belum `fund_campaign()`    | PENDING\_FUNDING |
+| funded dan `now <= end_time`                                | ACTIVE           |
+| funded dan `end_time < now <= end_time + settlement_period` | SETTLEMENT       |
+| `refund()` sudah dipanggil                                  | CLOSED           |
 
 Frontend menggabungkan `initialize_campaign()` dan `fund_campaign()` dalam satu transaksi sehingga PENDING\_FUNDING hampir tidak terlihat. Jika terpisah dan creator tidak pernah mendanai, tidak ada dana yang berisiko; creator dapat memanggil `close_unfunded()` untuk menutup akun dan mengambil kembali rent.
 
@@ -536,14 +536,14 @@ close_report()   close_submission()   close_stats()
 
 ### 10.3 Akun on-chain
 
-| Akun | Seed | Field utama |
-| --- | --- | --- |
-| Config | `["config"]` | `admin`, `pending_admin: Option<Pubkey>`, `oracle`, `bump` |
-| Campaign | `["campaign", creator, campaign_id_le_bytes]` | `campaign_id: u64`, `creator`, `mint`, `vault`, `terms_hash`, `cpm`, `max_payout_per_video`, `budget`, `total_funded`, `total_paid`, `start_time`, `end_time`, semua parameter waktu (termasuk `clock_skew_tolerance`), `status` (PendingFunding/Funded/Closed), `bump` |
-| Vault (token account) | `["vault", campaign]` | authority = Campaign PDA |
-| Submission | `["submission", campaign, video_id]` | `campaign`, `clipper`, `video_id`, `terms_hash`, `status`, `submitted_at`, `review_deadline`, `rejected_at`, `reason_hash`, `appealed_at`, `accepted_at`, `baseline_views: Option<u64>`, `total_paid`, `bump` |
-| OracleReport | `["report", submission]` | `submission`, `view_count`, `fetched_at`, `report_seq`, `is_final`, `reporter` |
-| ClipperStats | `["stats", campaign, clipper]` | `active_count`, `total_submitted` |
+| Akun                  | Seed                                          | Field utama                                                                                                                                                                                                                                                             |
+| --------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Config                | `["config"]`                                  | `admin`, `pending_admin: Option<Pubkey>`, `oracle`, `bump`                                                                                                                                                                                                              |
+| Campaign              | `["campaign", creator, campaign_id_le_bytes]` | `campaign_id: u64`, `creator`, `mint`, `vault`, `terms_hash`, `cpm`, `max_payout_per_video`, `budget`, `total_funded`, `total_paid`, `start_time`, `end_time`, semua parameter waktu (termasuk `clock_skew_tolerance`), `status` (PendingFunding/Funded/Closed), `bump` |
+| Vault (token account) | `["vault", campaign]`                         | authority = Campaign PDA                                                                                                                                                                                                                                                |
+| Submission            | `["submission", campaign, video_id]`          | `campaign`, `clipper`, `video_id`, `terms_hash`, `status`, `submitted_at`, `review_deadline`, `rejected_at`, `reason_hash`, `appealed_at`, `accepted_at`, `baseline_views: Option<u64>`, `total_paid`, `bump`                                                           |
+| OracleReport          | `["report", submission]`                      | `submission`, `view_count`, `fetched_at`, `report_seq`, `is_final`, `reporter`                                                                                                                                                                                          |
+| ClipperStats          | `["stats", campaign, clipper]`                | `active_count`, `total_submitted`                                                                                                                                                                                                                                       |
 
 Status submission: `PendingReview`, `Rejected`, `Accepted`, `RejectedFinal`.
 
@@ -551,29 +551,29 @@ Status submission: `PendingReview`, `Rejected`, `Accepted`, `RejectedFinal`.
 
 ### 10.4 Kode error program
 
-| Error | Arti / pesan UI |
-| --- | --- |
-| `NotCreator`, `NotClipper`, `NotOracle`, `NotAdmin`, `NotUpgradeAuthority` | Signer tidak berhak |
-| `ConfigAlreadyInitialized` | Config sudah diinisialisasi |
-| `InvalidParams` | Parameter campaign tidak valid |
-| `InvalidMint` | Token bukan aUSDC campaign |
-| `CampaignNotFunded`, `CampaignNotActive`, `CampaignClosed` | Status campaign tidak sesuai |
-| `OutsideCampaignPeriod` | Di luar start\_time..end\_time |
-| `SelfSubmission` | Creator tidak boleh submit ke campaign sendiri |
-| `QuotaExceeded` | Batas video aktif per clipper tercapai |
-| `TotalQuotaExceeded` | Batas total submission per clipper tercapai |
-| `InvalidStatus` | Status submission tidak sesuai |
-| `ReviewDeadlinePassed`, `ReviewDeadlineNotReached` | Batas review |
-| `AppealWindowClosed`, `AlreadyAppealed` | Aturan appeal |
-| `BaselineMissing` | Baseline views belum ada |
-| `ReportReplay`, `ViewsDecreased`, `ReportFromFuture`, `ReportBeforeSubmission`, `ReportAfterEnd` | Report oracle tidak valid |
-| `FinalOutsideWindow`, `FinalAlreadyReceived`, `FinalBeforeBaseline` | Aturan report final |
-| `InvalidReporter` | Report berasal dari oracle lama; minta report baru |
-| `ReportTooOld` | Report kedaluwarsa; minta report baru |
-| `FinalReportPending` | Menunggu report final dari oracle |
-| `SettlementOver`, `SettlementNotOver` | Batas settlement |
-| `NothingToClaim`, `PoolEmpty` | Tidak ada yang dapat diklaim / pool kosong |
-| `MathOverflow` | Overflow pada checked math |
+| Error                                                                                            | Arti / pesan UI                                    |
+| ------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `NotCreator`, `NotClipper`, `NotOracle`, `NotAdmin`, `NotUpgradeAuthority`                       | Signer tidak berhak                                |
+| `ConfigAlreadyInitialized`                                                                       | Config sudah diinisialisasi                        |
+| `InvalidParams`                                                                                  | Parameter campaign tidak valid                     |
+| `InvalidMint`                                                                                    | Token bukan aUSDC campaign                         |
+| `CampaignNotFunded`, `CampaignNotActive`, `CampaignClosed`                                       | Status campaign tidak sesuai                       |
+| `OutsideCampaignPeriod`                                                                          | Di luar start\_time..end\_time                     |
+| `SelfSubmission`                                                                                 | Creator tidak boleh submit ke campaign sendiri     |
+| `QuotaExceeded`                                                                                  | Batas video aktif per clipper tercapai             |
+| `TotalQuotaExceeded`                                                                             | Batas total submission per clipper tercapai        |
+| `InvalidStatus`                                                                                  | Status submission tidak sesuai                     |
+| `ReviewDeadlinePassed`, `ReviewDeadlineNotReached`                                               | Batas review                                       |
+| `AppealWindowClosed`, `AlreadyAppealed`                                                          | Aturan appeal                                      |
+| `BaselineMissing`                                                                                | Baseline views belum ada                           |
+| `ReportReplay`, `ViewsDecreased`, `ReportFromFuture`, `ReportBeforeSubmission`, `ReportAfterEnd` | Report oracle tidak valid                          |
+| `FinalOutsideWindow`, `FinalAlreadyReceived`, `FinalBeforeBaseline`                              | Aturan report final                                |
+| `InvalidReporter`                                                                                | Report berasal dari oracle lama; minta report baru |
+| `ReportTooOld`                                                                                   | Report kedaluwarsa; minta report baru              |
+| `FinalReportPending`                                                                             | Menunggu report final dari oracle                  |
+| `SettlementOver`, `SettlementNotOver`                                                            | Batas settlement                                   |
+| `NothingToClaim`, `PoolEmpty`                                                                    | Tidak ada yang dapat diklaim / pool kosong         |
+| `MathOverflow`                                                                                   | Overflow pada checked math                         |
 
 Frontend memetakan setiap kode ke pesan yang dapat dipahami user.
 
@@ -642,16 +642,16 @@ Transaksi milik user (init/fund, submit, review, appeal, claim, refund) ditandat
 
 ### 11.1 Daftar API
 
-| Area | Endpoint |
-| --- | --- |
-| Auth | `POST /auth/nonce`, `POST /auth/verify`, `POST /auth/logout` |
-| YouTube | `GET /youtube/connect`, `GET /youtube/callback`, `GET /youtube/videos`, `DELETE /youtube/channel` |
-| Campaign | `POST /campaigns` (metadata + upload terms, mengembalikan `terms_hash`), `GET /campaigns`, `GET /campaigns/:id`, `GET /campaigns/:id/terms` (signed URL) |
-| Submission | `POST /campaigns/:id/submissions` (verifikasi, mengembalikan data transaksi), `GET /campaigns/:id/submissions`, `GET /submissions/:id` |
-| Review | `POST /submissions/:id/review-note` (alasan reject / catatan appeal, disimpan off-chain) |
-| Claim | `POST /submissions/:id/claim-request`, `GET /claim-requests/:id`, `GET /submissions/:id/claims` |
-| Notifikasi | `GET /me/notifications`, `POST /me/notifications/:id/read`, `PUT /me/email` |
-| Faucet | `POST /faucet` |
+| Area                | Endpoint                                                                                                                                                                   |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth                | `POST /auth/nonce`, `POST /auth/verify`, `POST /auth/logout`                                                                                                               |
+| YouTube             | `GET /youtube/connect`, `GET /youtube/callback`, `GET /youtube/videos`, `DELETE /youtube/channel`                                                                          |
+| Campaign            | `POST /campaigns` (metadata + upload terms, mengembalikan `terms_hash`), `GET /campaigns`, `GET /campaigns/:id`, `GET /campaigns/:id/terms` (signed URL)                   |
+| Submission          | `POST /campaigns/:id/submissions` (verifikasi, mengembalikan data transaksi), `GET /campaigns/:id/submissions`, `GET /submissions/:id`                                     |
+| Review              | `POST /submissions/:id/review-note` (alasan reject / catatan appeal, disimpan off-chain)                                                                                   |
+| Claim               | `POST /submissions/:id/claim-request`, `GET /claim-requests/:id`, `GET /submissions/:id/claims`                                                                            |
+| Notifikasi          | `GET /me/notifications`, `POST /me/notifications/:id/read`                                                                                                                 |
+| Faucet              | `POST /faucet`                                                                                                                                                             |
 | Internal (demo/ops) | `POST /internal/oracle/run` (trigger manual oracle worker), `POST /internal/oracle/holds/:id/release`, `POST /internal/oracle/holds/:id/discard` (semua dilindungi secret) |
 
 ### 11.2 Orkestrasi claim (dua langkah)
@@ -688,20 +688,20 @@ On-chain adalah sumber kebenaran; database adalah cache. Indexer membaca event p
 
 PostgreSQL menyimpan data off-chain. Semua kolom status/on-chain adalah cache dari event (Section 11.3).
 
-| Tabel | Kolom |
-| --- | --- |
-| `users` | `wallet` (PK), `email` (nullable), `nonce`, `nonce_expires_at`, `created_at` |
-| `youtube_channels` | `id`, `wallet` (FK), `channel_id` (UNIQUE), `title`, `subscriber_count`, `channel_created_at`, `refresh_token_encrypted`, `revoked_at`, `created_at` |
-| `campaigns` | `id` (bigint = `campaign_id` on-chain), `creator_wallet`, `title`, `brief`, `source_video`, `required_mention`, `payment_mint`, `terms_file_path`, `terms_hash`, `cpm`, `max_payout_per_video`, `budget`, `total_funded`, `total_paid`, `start_time`, `end_time`, `review_period`, `appeal_window`, `appeal_timeout`, `settlement_period`, `max_report_age`, `final_snapshot_tolerance`, `clock_skew_tolerance`, `max_videos_per_clipper`, `min_subscribers`, `min_channel_age_days`, `status` (PENDING\_FUNDING/FUNDED/CLOSED), `onchain_campaign`, `created_at` |
-| `submissions` | `id`, `campaign_id`, `clipper_wallet`, `youtube_video_id`, `channel_id`, `title`, `published_at`, `status` (PENDING\_REVIEW/REJECTED/ACCEPTED/REJECTED\_FINAL), `onchain_submission`, `submitted_at`, `review_deadline`, `rejected_at`, `appealed_at`, `accepted_at`, `reason_hash`, `baseline_views`, `total_paid`, `terms_hash`, `register_tx`, `created_at`; UNIQUE (`campaign_id`, `youtube_video_id`) |
-| `clipper_stats` | `campaign_id`, `clipper_wallet`, `active_count`, `total_submitted`; PK (`campaign_id`, `clipper_wallet`) |
-| `review_actions` | `id`, `submission_id`, `actor_wallet`, `action` (ACCEPT/REJECT/APPEAL/AUTO\_ACCEPT), `reason`, `reason_hash`, `tx_signature`, `created_at` |
-| `view_snapshots` | `id`, `submission_id`, `view_count`, `availability`, `fetched_at`, `flagged` (bool) |
-| `oracle_reports` | `id`, `submission_id`, `report_seq`, `view_count`, `fetched_at`, `is_final`, `is_baseline`, `reporter`, `tx_signature`, `status` (pending/confirmed/failed/held/discarded), `hold_reason`, `attempts`, `created_at` |
-| `claim_requests` | `id`, `submission_id`, `clipper_wallet`, `status` (PENDING/READY/FAILED/EXPIRED/DONE), `error_code`, `attempts`, `created_at`, `updated_at`; partial UNIQUE (`submission_id`) WHERE status IN (PENDING, READY) |
-| `claims` | `id`, `submission_id`, `amount`, `remaining_claim`, `tx_signature`, `created_at` |
-| `notifications` | `id`, `wallet`, `type`, `payload`, `read_at`, `emailed_at`, `created_at` |
-| `indexer_cursor` | `id`, `last_signature`, `updated_at` |
+| Tabel              | Kolom                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `users`            | `wallet` (PK), `nonce`, `nonce_expires_at`, `created_at`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `youtube_channels` | `id`, `wallet` (FK), `channel_id` (UNIQUE), `title`, `subscriber_count`, `channel_created_at`, `refresh_token_encrypted`, `revoked_at`, `created_at`                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `campaigns`        | `id` (bigint = `campaign_id` on-chain), `creator_wallet`, `title`, `brief`, `source_video`, `required_mention`, `payment_mint`, `terms_file_path`, `terms_hash`, `cpm`, `max_payout_per_video`, `budget`, `total_funded`, `total_paid`, `start_time`, `end_time`, `review_period`, `appeal_window`, `appeal_timeout`, `settlement_period`, `max_report_age`, `final_snapshot_tolerance`, `clock_skew_tolerance`, `max_videos_per_clipper`, `min_subscribers`, `min_channel_age_days`, `status` (PENDING\_FUNDING/FUNDED/CLOSED), `onchain_campaign`, `created_at` |
+| `submissions`      | `id`, `campaign_id`, `clipper_wallet`, `youtube_video_id`, `channel_id`, `title`, `published_at`, `status` (PENDING\_REVIEW/REJECTED/ACCEPTED/REJECTED\_FINAL), `onchain_submission`, `submitted_at`, `review_deadline`, `rejected_at`, `appealed_at`, `accepted_at`, `reason_hash`, `baseline_views`, `total_paid`, `terms_hash`, `register_tx`, `created_at`; UNIQUE (`campaign_id`, `youtube_video_id`)                                                                                                                                                        |
+| `clipper_stats`    | `campaign_id`, `clipper_wallet`, `active_count`, `total_submitted`; PK (`campaign_id`, `clipper_wallet`)                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `review_actions`   | `id`, `submission_id`, `actor_wallet`, `action` (ACCEPT/REJECT/APPEAL/AUTO\_ACCEPT), `reason`, `reason_hash`, `tx_signature`, `created_at`                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `view_snapshots`   | `id`, `submission_id`, `view_count`, `availability`, `fetched_at`, `flagged` (bool)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `oracle_reports`   | `id`, `submission_id`, `report_seq`, `view_count`, `fetched_at`, `is_final`, `is_baseline`, `reporter`, `tx_signature`, `status` (pending/confirmed/failed/held/discarded), `hold_reason`, `attempts`, `created_at`                                                                                                                                                                                                                                                                                                                                               |
+| `claim_requests`   | `id`, `submission_id`, `clipper_wallet`, `status` (PENDING/READY/FAILED/EXPIRED/DONE), `error_code`, `attempts`, `created_at`, `updated_at`; partial UNIQUE (`submission_id`) WHERE status IN (PENDING, READY)                                                                                                                                                                                                                                                                                                                                                    |
+| `claims`           | `id`, `submission_id`, `amount`, `remaining_claim`, `tx_signature`, `created_at`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `notifications`    | `id`, `wallet`, `type`, `payload`, `read_at`, `created_at`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `indexer_cursor`   | `id`, `last_signature`, `updated_at`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 **Retensi data YouTube.** Data yang diambil dari YouTube API (`view_snapshots`, metadata video) hanya disimpan sebatas keperluan verifikasi dan payout. Data lama dihapus atau diringkas setelah campaign CLOSED ditambah masa tenggang, dan data API yang disimpan di-refresh atau dihapus dalam batas waktu yang disyaratkan kebijakan YouTube API Services (periksa persyaratan terbaru sebelum produksi). Snapshot yang masih dibutuhkan untuk pemulihan rotasi oracle (Section 7.7) dipertahankan sampai `end_time + settlement_period`.
 
@@ -724,12 +724,12 @@ YouTube OAuth dipakai terpisah untuk mengikat wallet ke channel. Gunakan scope r
 
 **Pemisahan key dan secret:**
 
-| Key | Dipegang oleh | Catatan |
-| --- | --- | --- |
-| Oracle key | Oracle Worker | KMS/secret manager di produksi; bukan di server API |
-| Admin Config | Wallet admin / multisig | Hanya ganti oracle dan admin; tanpa akses dana |
-| Upgrade authority | Deployer / multisig | Hanya untuk upgrade program dan `initialize_config` |
-| Faucet mint authority | Service faucet (devnet) | Tidak dipakai di mainnet |
+| Key                   | Dipegang oleh           | Catatan                                             |
+| --------------------- | ----------------------- | --------------------------------------------------- |
+| Oracle key            | Oracle Worker           | KMS/secret manager di produksi; bukan di server API |
+| Admin Config          | Wallet admin / multisig | Hanya ganti oracle dan admin; tanpa akses dana      |
+| Upgrade authority     | Deployer / multisig     | Hanya untuk upgrade program dan `initialize_config` |
+| Faucet mint authority | Service faucet (devnet) | Tidak dipakai di mainnet                            |
 
 ## 14. Demo Scope
 
@@ -753,16 +753,16 @@ Semua durasi memakai kolom "Default demo" (Section 4.1). Total jendela review, f
 
 Parameter: `cpm = 2 aUSDC per 1000 views`, `max_payout_per_video = 50 aUSDC`, `budget = 60 aUSDC`.
 
-| Langkah | Aktor | Views dilaporkan (baseline) | Entitlement | Dibayar | Pool setelahnya |
-| --- | --- | --- | --- | --- | --- |
-| Fund | Creator | — | — | — | 60 |
-| Claim 1 | Clipper A | 11.000 (1.000) | 20 | 20 | 40 |
-| Claim 2 | Clipper A | 31.000 (1.000) | 60 → cap 50 | 30 | 10 |
-| Claim 3 | Clipper B | 20.500 (500) | 40 | 10 (partial), sisa klaim 30 | 0 |
-| Top-up | Creator | — | — | — | 50 |
-| Claim 4 | Clipper B | tanpa views baru | 40 | 30 | 20 |
-| Final | Clipper B | 25.500 (500), `is_final` | 50 (cap) | 10 | 10 |
-| Refund | Creator | — | — | — | 10 → wallet creator |
+| Langkah | Aktor     | Views dilaporkan (baseline) | Entitlement | Dibayar                     | Pool setelahnya     |
+| ------- | --------- | --------------------------- | ----------- | --------------------------- | ------------------- |
+| Fund    | Creator   | —                           | —           | —                           | 60                  |
+| Claim 1 | Clipper A | 11.000 (1.000)              | 20          | 20                          | 40                  |
+| Claim 2 | Clipper A | 31.000 (1.000)              | 60 → cap 50 | 30                          | 10                  |
+| Claim 3 | Clipper B | 20.500 (500)                | 40          | 10 (partial), sisa klaim 30 | 0                   |
+| Top-up  | Creator   | —                           | —           | —                           | 50                  |
+| Claim 4 | Clipper B | tanpa views baru            | 40          | 30                          | 20                  |
+| Final   | Clipper B | 25.500 (500), `is_final`    | 50 (cap)    | 10                          | 10                  |
+| Refund  | Creator   | —                           | —           | —                           | 10 → wallet creator |
 
 **Invarian yang harus selalu benar:** total dibayar + saldo vault = total didanai (60 + 50 = 110 = 100 dibayar + 10 refund).
 
@@ -800,30 +800,30 @@ Parameter: `cpm = 2 aUSDC per 1000 views`, `max_payout_per_video = 50 aUSDC`, `b
 
 ## 16. Error & Failure Handling
 
-| Skenario | Handling |
-| --- | --- |
-| YouTube API down saat verification | Return error ke clipper; submission tidak dibuat |
-| Oracle gagal submit report | Retry exponential backoff; claim ditunda, tidak gagal permanen; alert jika melewati SLA |
-| Report kedaluwarsa saat claim | `ReportTooOld`; backend meminta report baru otomatis satu kali (Section 11.2) |
-| Final snapshot belum tersedia setelah end\_time | `FinalReportPending` sampai `end_time + tolerance`; setelahnya fallback ke report non-final terakhir (Section 7.6) |
-| Views YouTube turun | Oracle melaporkan `max(terbaru, terakhir)`; tidak ada pengurangan reward |
-| Lonjakan views anomali | Report ditandai `held`, alert, tinjau manual sebelum dikirim atau dibuang (Section 7.4) |
-| Clock skew oracle vs on-chain | Margin `clock_skew_tolerance`; `fetched_at = min(server, chain)`; NTP |
-| RPC Solana gagal | Retry dengan backoff; UI menampilkan status pending |
-| Claim dipanggil dua kali | Claim kedua gagal `NothingToClaim`; tidak ada pembayaran ganda |
-| Spam claim-request | Unique PENDING per submission, cooldown, rate limit; status FAILED |
-| Pool habis saat ACTIVE | Campaign tetap ACTIVE; payout partial atau `PoolEmpty`; tidak auto-close |
-| Channel dicabut aksesnya | Submission baru diblokir; claim existing tidak terpengaruh |
-| Video dihapus/private setelah ACCEPTED | Known limitation; oracle melaporkan views terakhir |
-| Video duplikat | Ditolak saat verification dan on-chain (seed PDA) |
-| Clipper submit–reject berulang | Dibatasi `total_submitted` (2 × batas aktif) |
-| Creator tidak respons review/appeal | `finalize_timeout()` oleh siapa saja; submission diterima otomatis; creator diberi notifikasi sebelumnya |
-| Creator tidak memanggil `refund()` | Claim tetap berakhir otomatis; dana sisa tetap di vault (known limitation); pembersihan akun clipper/oracle tidak terhalang (Section 9.1) |
-| Campaign tidak pernah didanai | Tidak ada dana berisiko; `close_unfunded()` mengambil kembali rent |
-| Oracle tidak mengirim baseline | Alert 5 menit; claim ditolak `BaselineMissing` sampai baseline terkirim |
-| Oracle key bocor | Admin segera `update_oracle()`; report lama otomatis tidak valid untuk claim (`InvalidReporter`); oracle baru mengirim ulang report termasuk final (Section 7.4 aturan 9, Section 7.7); audit semua baseline dan claim sejak waktu kebocoran |
-| Admin key salah dikirim | Transfer dua langkah (`propose_admin` lalu `accept_admin`) |
-| Supabase Storage down | Upload/akses terms gagal; campaign tidak dibuat sampai terms tersimpan |
+| Skenario                                        | Handling                                                                                                                                                                                                                                     |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| YouTube API down saat verification              | Return error ke clipper; submission tidak dibuat                                                                                                                                                                                             |
+| Oracle gagal submit report                      | Retry exponential backoff; claim ditunda, tidak gagal permanen; alert jika melewati SLA                                                                                                                                                      |
+| Report kedaluwarsa saat claim                   | `ReportTooOld`; backend meminta report baru otomatis satu kali (Section 11.2)                                                                                                                                                                |
+| Final snapshot belum tersedia setelah end\_time | `FinalReportPending` sampai `end_time + tolerance`; setelahnya fallback ke report non-final terakhir (Section 7.6)                                                                                                                           |
+| Views YouTube turun                             | Oracle melaporkan `max(terbaru, terakhir)`; tidak ada pengurangan reward                                                                                                                                                                     |
+| Lonjakan views anomali                          | Report ditandai `held`, alert, tinjau manual sebelum dikirim atau dibuang (Section 7.4)                                                                                                                                                      |
+| Clock skew oracle vs on-chain                   | Margin `clock_skew_tolerance`; `fetched_at = min(server, chain)`; NTP                                                                                                                                                                        |
+| RPC Solana gagal                                | Retry dengan backoff; UI menampilkan status pending                                                                                                                                                                                          |
+| Claim dipanggil dua kali                        | Claim kedua gagal `NothingToClaim`; tidak ada pembayaran ganda                                                                                                                                                                               |
+| Spam claim-request                              | Unique PENDING per submission, cooldown, rate limit; status FAILED                                                                                                                                                                           |
+| Pool habis saat ACTIVE                          | Campaign tetap ACTIVE; payout partial atau `PoolEmpty`; tidak auto-close                                                                                                                                                                     |
+| Channel dicabut aksesnya                        | Submission baru diblokir; claim existing tidak terpengaruh                                                                                                                                                                                   |
+| Video dihapus/private setelah ACCEPTED          | Known limitation; oracle melaporkan views terakhir                                                                                                                                                                                           |
+| Video duplikat                                  | Ditolak saat verification dan on-chain (seed PDA)                                                                                                                                                                                            |
+| Clipper submit–reject berulang                  | Dibatasi `total_submitted` (2 × batas aktif)                                                                                                                                                                                                 |
+| Creator tidak respons review/appeal             | `finalize_timeout()` oleh siapa saja; submission diterima otomatis; creator diberi notifikasi sebelumnya                                                                                                                                     |
+| Creator tidak memanggil `refund()`              | Claim tetap berakhir otomatis; dana sisa tetap di vault (known limitation); pembersihan akun clipper/oracle tidak terhalang (Section 9.1)                                                                                                    |
+| Campaign tidak pernah didanai                   | Tidak ada dana berisiko; `close_unfunded()` mengambil kembali rent                                                                                                                                                                           |
+| Oracle tidak mengirim baseline                  | Alert 5 menit; claim ditolak `BaselineMissing` sampai baseline terkirim                                                                                                                                                                      |
+| Oracle key bocor                                | Admin segera `update_oracle()`; report lama otomatis tidak valid untuk claim (`InvalidReporter`); oracle baru mengirim ulang report termasuk final (Section 7.4 aturan 9, Section 7.7); audit semua baseline dan claim sejak waktu kebocoran |
+| Admin key salah dikirim                         | Transfer dua langkah (`propose_admin` lalu `accept_admin`)                                                                                                                                                                                   |
+| Supabase Storage down                           | Upload/akses terms gagal; campaign tidak dibuat sampai terms tersimpan                                                                                                                                                                       |
 
 ## 17. Rencana Testing & Kriteria Sukses
 

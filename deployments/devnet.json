@@ -1,0 +1,24 @@
+{
+  "cluster": "devnet",
+  "rpcUrl": "https://api.devnet.solana.com",
+  "program": {
+    "address": "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy",
+    "programDataAddress": "CHdAaFZ4z91GoEbtg6UbvDwDnPnsF4DBg8ZdAet1Jqjq",
+    "idlMetadataAddress": "Aeq8wn98bJkrHu8Nxj4DoEn6Q1tQuftWp8ozH71uvKYc",
+    "upgradeAuthority": "6epHJMDaqdoYVwJFU8VfVXFxzrjccESwJcM9FtS7E4Vp",
+    "lastDeployedSlot": 508428062
+  },
+  "config": {
+    "address": "9C7pFCsuX1euSuLb4rMTtUMZzKiqBwXuFjDiHJj8pno3",
+    "admin": "6epHJMDaqdoYVwJFU8VfVXFxzrjccESwJcM9FtS7E4Vp",
+    "oracle": "4yyX9nQ7SU7NLDZwPymsAHLyF4MTVugKZktNySuQtY9t",
+    "bump": 255,
+    "initializeTransaction": "3hDbppMRB77QMsAJW5cXBWkg6h4XeVFafRXMffFGzsf5FfSP6BAwAhysfcj38WSBvAVRsDwo1uqpbwrEbVVSVqpk"
+  },
+  "tokens": {
+    "aUsdcMint": "67tawTkJ6Ft2k7SJER8KuP1aQBbgdZMrFyJfUJT7tzZU",
+    "decimals": 6,
+    "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "mintAuthority": "6epHJMDaqdoYVwJFU8VfVXFxzrjccESwJcM9FtS7E4Vp"
+  }
+}

@@ -6,4 +6,8 @@
  * @see https://github.com/codama-idl/codama
  */
 
+export * from "./config";
+export * from "./report";
+export * from "./stats";
+export * from "./submission";
 export * from "./vault";
