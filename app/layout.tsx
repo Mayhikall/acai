@@ -1,27 +1,20 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
-import { Providers } from "./components/providers";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+const barlow = localFont({
+  src: [
+    { path: "./_assets/barlow-regular.ttf", weight: "400", style: "normal" },
+    { path: "./_assets/barlow-medium.ttf", weight: "500", style: "normal" },
+  ],
+  variable: "--font-barlow",
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Solana dApp Starter",
-  description: "A minimal Next.js starter powered by @solana/kit",
-  icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
-  },
+  title: "Prism | Your next clip starts here",
+  description:
+    "Explore the creator workflow, calculate example earnings, and plan your next clip or brand campaign with Prism.",
 };
 
 export default function RootLayout({
@@ -30,10 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${geistMono.variable} antialiased`}>
-        <Providers>{children}</Providers>
-      </body>
+    <html lang="en">
+      <body className={barlow.variable}>{children}</body>
     </html>
   );
 }
