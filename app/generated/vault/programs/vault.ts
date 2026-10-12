@@ -58,7 +58,7 @@ import {
 } from "../instructions";
 
 export const VAULT_PROGRAM_ADDRESS =
-  "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy" as Address<"5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy">;
+  "CceJJ1LXS13HDMJRVdhw8GEw42r3roULbX5kCABG6K8E" as Address<"CceJJ1LXS13HDMJRVdhw8GEw42r3roULbX5kCABG6K8E">;
 
 export enum VaultAccount {
   Campaign,
@@ -373,7 +373,7 @@ export function identifyVaultInstruction(
 }
 
 export type ParsedVaultInstruction<
-  TProgram extends string = "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy",
+  TProgram extends string = "CceJJ1LXS13HDMJRVdhw8GEw42r3roULbX5kCABG6K8E",
 > =
   | ({
       instructionType: VaultInstruction.AcceptAdmin;

@@ -171,3 +171,94 @@ export async function buildClaimIntent({
     clipper
   );
 }
+
+export async function buildRefundIntent({
+  campaign,
+  creator,
+  mint,
+}) {
+  const vault = await deriveVaultAddress(campaign);
+  const creatorTokenAccount = await deriveAtaAddress(creator, mint);
+  return intent(
+    [
+      {
+        name: "create_associated_token_account_idempotent",
+        programId: ASSOCIATED_TOKEN_PROGRAM,
+        accounts: {
+          payer: creator,
+          associatedToken: creatorTokenAccount,
+          owner: creator,
+          mint,
+          systemProgram: SYSTEM_PROGRAM,
+          tokenProgram: TOKEN_PROGRAM,
+        },
+        args: {},
+      },
+      {
+        name: "refund",
+        accounts: {
+          campaign,
+          vault,
+          creatorTokenAccount,
+          mint,
+          creator,
+          tokenProgram: TOKEN_PROGRAM,
+        },
+        args: {},
+      },
+    ],
+    creator
+  );
+}
+
+export async function buildAcceptSubmissionIntent({
+  campaign,
+  submission,
+  clipper,
+  creator,
+}) {
+  const stats = await deriveStatsAddress(campaign, clipper);
+  return intent(
+    [
+      {
+        name: "accept_submission",
+        accounts: {
+          campaign,
+          submission,
+          stats,
+          creator,
+        },
+        args: {},
+      },
+    ],
+    creator
+  );
+}
+
+export async function buildRejectSubmissionIntent({
+  campaign,
+  submission,
+  clipper,
+  creator,
+  reasonHash,
+}) {
+  const stats = await deriveStatsAddress(campaign, clipper);
+  const formattedReason = Array.isArray(reasonHash)
+    ? reasonHash
+    : Array.from(Buffer.from(reasonHash.padStart(64, "0"), "hex"));
+  return intent(
+    [
+      {
+        name: "reject_submission",
+        accounts: {
+          campaign,
+          submission,
+          stats,
+          creator,
+        },
+        args: { reason_hash: formattedReason },
+      },
+    ],
+    creator
+  );
+}

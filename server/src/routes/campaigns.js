@@ -6,7 +6,7 @@ import { db } from "../db/index.js";
 import { requireAuth } from "../middleware/auth.js";
 import { AppError, asyncHandler } from "../lib/errors.js";
 import { getTermsUrl, uploadTerms } from "../services/terms-storage.js";
-import { buildCreateCampaignIntent } from "../services/transaction-intents.js";
+import { buildCreateCampaignIntent, buildRefundIntent } from "../services/transaction-intents.js";
 
 const router = Router();
 const upload = multer({
@@ -171,6 +171,45 @@ router.get(
       url: await getTermsUrl(campaign.terms_file_path),
       expiresIn: 300,
       termsHash: campaign.terms_hash,
+    });
+  })
+);
+
+
+router.post(
+  "/:id/refund-intent",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const campaign = await db("campaigns").where({ id: req.params.id }).first();
+    if (!campaign)
+      throw new AppError(404, "CAMPAIGN_NOT_FOUND", "Campaign not found");
+    if (campaign.creator_wallet !== req.auth.wallet)
+      throw new AppError(403, "FORBIDDEN", "Only the campaign creator can request a refund");
+    if (campaign.status === "CLOSED")
+      throw new AppError(409, "CAMPAIGN_ALREADY_CLOSED", "Campaign is already closed and refunded");
+    if (campaign.status !== "FUNDED")
+      throw new AppError(400, "INVALID_STATE", "Campaign must be funded before it can be refunded");
+
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const eligibleAt = Number(campaign.end_time) + Number(campaign.settlement_period);
+    if (nowSeconds <= eligibleAt) {
+      throw new AppError(
+        400,
+        "CAMPAIGN_STILL_ACTIVE",
+        `Refund cannot be claimed until campaign and settlement period have ended (eligible at ${new Date(eligibleAt * 1000).toISOString()})`
+      );
+    }
+
+    const transaction = await buildRefundIntent({
+      campaign: campaign.onchain_campaign,
+      creator: req.auth.wallet,
+      mint: campaign.payment_mint,
+    });
+
+    res.json({
+      campaignId: campaign.id,
+      eligibleAt,
+      transaction,
     });
   })
 );

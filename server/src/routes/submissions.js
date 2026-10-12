@@ -9,8 +9,10 @@ import { calculateRemainingClaim } from "../services/claims.js";
 import { verifySubmission } from "../services/submission-verification.js";
 import { runOracle } from "../services/oracle-worker.js";
 import {
+  buildAcceptSubmissionIntent,
   buildClaimIntent,
   buildRegisterSubmissionIntent,
+  buildRejectSubmissionIntent,
   deriveVaultAddress,
 } from "../services/transaction-intents.js";
 
@@ -162,6 +164,80 @@ router.post(
     res.status(201).json({ note });
   })
 );
+
+router.post(
+  "/submissions/:id/accept-intent",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const submission = await db("submissions as s")
+      .join("campaigns as c", "c.id", "s.campaign_id")
+      .select("s.*", "c.creator_wallet", "c.onchain_campaign")
+      .where("s.id", req.params.id)
+      .first();
+    if (!submission)
+      throw new AppError(404, "SUBMISSION_NOT_FOUND", "Submission not found");
+    if (submission.creator_wallet !== req.auth.wallet)
+      throw new AppError(403, "FORBIDDEN", "Only campaign creator can accept submissions");
+    if (submission.status !== "PENDING_REVIEW")
+      throw new AppError(400, "INVALID_STATE", `Submission is already ${submission.status}`);
+
+    const transaction = await buildAcceptSubmissionIntent({
+      campaign: submission.onchain_campaign,
+      submission: submission.onchain_submission,
+      clipper: submission.clipper_wallet,
+      creator: req.auth.wallet,
+    });
+
+    res.json({
+      submissionId: submission.id,
+      transaction,
+    });
+  })
+);
+
+router.post(
+  "/submissions/:id/reject-intent",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const input = z
+      .object({
+        reason: z.string().trim().min(1).max(5000),
+      })
+      .parse(req.body);
+
+    const submission = await db("submissions as s")
+      .join("campaigns as c", "c.id", "s.campaign_id")
+      .select("s.*", "c.creator_wallet", "c.onchain_campaign")
+      .where("s.id", req.params.id)
+      .first();
+    if (!submission)
+      throw new AppError(404, "SUBMISSION_NOT_FOUND", "Submission not found");
+    if (submission.creator_wallet !== req.auth.wallet)
+      throw new AppError(403, "FORBIDDEN", "Only campaign creator can reject submissions");
+    if (submission.status !== "PENDING_REVIEW")
+      throw new AppError(400, "INVALID_STATE", `Submission is already ${submission.status}`);
+
+    const reasonHash = crypto
+      .createHash("sha256")
+      .update(input.reason)
+      .digest("hex");
+
+    const transaction = await buildRejectSubmissionIntent({
+      campaign: submission.onchain_campaign,
+      submission: submission.onchain_submission,
+      clipper: submission.clipper_wallet,
+      creator: req.auth.wallet,
+      reasonHash,
+    });
+
+    res.json({
+      submissionId: submission.id,
+      reasonHash,
+      transaction,
+    });
+  })
+);
+
 
 router.post(
   "/submissions/:id/claim-request",

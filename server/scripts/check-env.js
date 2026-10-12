@@ -77,9 +77,12 @@ if (chainIndexer) enabled.push("Finalized chain indexer");
 if (workers) enabled.push("Maintenance workers");
 if (oracleSubmit) {
   enabled.push("On-chain oracle submitter");
-  for (const name of ["ORACLE_REPORTER", "ORACLE_KEYPAIR_PATH"])
-    required(name, "saat ORACLE_SUBMIT_ENABLED=true");
-  if (process.env.ORACLE_KEYPAIR_PATH) {
+  if (!process.env.ORACLE_REPORTER)
+    errors.push("ORACLE_REPORTER: wajib saat ORACLE_SUBMIT_ENABLED=true");
+  if (!process.env.ORACLE_KEYPAIR_PATH && !process.env.ORACLE_KEYPAIR_SECRET) {
+    errors.push("ORACLE_KEYPAIR_PATH atau ORACLE_KEYPAIR_SECRET: wajib saat ORACLE_SUBMIT_ENABLED=true");
+  }
+  if (process.env.ORACLE_KEYPAIR_PATH && !process.env.ORACLE_KEYPAIR_SECRET) {
     try {
       const stat = await fs.stat(process.env.ORACLE_KEYPAIR_PATH);
       if ((stat.mode & 0o077) !== 0) errors.push("ORACLE_KEYPAIR_PATH: jalankan chmod 600");

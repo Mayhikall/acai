@@ -157,6 +157,18 @@ router.get(
 );
 
 router.get(
+  "/channel",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const channel = await db("youtube_channels")
+      .where({ wallet: req.auth.wallet })
+      .whereNull("revoked_at")
+      .first();
+    res.json({ channel: channel || null });
+  })
+);
+
+router.get(
   "/videos",
   requireAuth,
   asyncHandler(async (req, res) => {
