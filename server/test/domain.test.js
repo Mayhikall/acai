@@ -10,9 +10,12 @@ import {
   processDecodedEvents,
 } from "../src/services/chain-indexer.js";
 import {
+  buildAcceptSubmissionIntent,
   buildClaimIntent,
   buildCreateCampaignIntent,
+  buildRefundIntent,
   buildRegisterSubmissionIntent,
+  buildRejectSubmissionIntent,
 } from "../src/services/transaction-intents.js";
 
 test("auth message binds domain, URI, chain, nonce, and expiration", () => {
@@ -211,4 +214,52 @@ test("chain indexer does not quarantine infrastructure failures", async () => {
     }),
     /database unavailable/
   );
+});
+
+test("refund transaction intent creates creator ATA and calls refund", async () => {
+  const campaign = "11111111111111111111111111111111";
+  const creator = "So11111111111111111111111111111111111111112";
+  const mint = "Vote111111111111111111111111111111111111111";
+  const transaction = await buildRefundIntent({
+    campaign,
+    creator,
+    mint,
+  });
+  assert.equal(transaction.instructions.length, 2);
+  assert.equal(
+    transaction.instructions[0].name,
+    "create_associated_token_account_idempotent"
+  );
+  assert.equal(transaction.instructions[1].name, "refund");
+  assert.equal(transaction.instructions[1].accounts.creator, creator);
+  assert.equal(transaction.instructions[1].accounts.mint, mint);
+  assert.ok(transaction.instructions[1].accounts.vault);
+});
+
+test("accept and reject submission intents derive stats PDA and creator signer", async () => {
+  const campaign = "11111111111111111111111111111111";
+  const submission = "So11111111111111111111111111111111111111112";
+  const clipper = "BPFLoaderUpgradeab1e11111111111111111111111";
+  const creator = "Vote111111111111111111111111111111111111111";
+
+  const accept = await buildAcceptSubmissionIntent({
+    campaign,
+    submission,
+    clipper,
+    creator,
+  });
+  assert.equal(accept.instructions[0].name, "accept_submission");
+  assert.equal(accept.instructions[0].accounts.creator, creator);
+  assert.ok(accept.instructions[0].accounts.stats);
+
+  const reject = await buildRejectSubmissionIntent({
+    campaign,
+    submission,
+    clipper,
+    creator,
+    reasonHash: "aa".repeat(32),
+  });
+  assert.equal(reject.instructions[0].name, "reject_submission");
+  assert.equal(reject.instructions[0].accounts.creator, creator);
+  assert.equal(reject.instructions[0].args.reason_hash.length, 32);
 });

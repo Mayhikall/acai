@@ -2,23 +2,22 @@
   "cluster": "devnet",
   "rpcUrl": "https://api.devnet.solana.com",
   "program": {
-    "address": "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy",
-    "programDataAddress": "CHdAaFZ4z91GoEbtg6UbvDwDnPnsF4DBg8ZdAet1Jqjq",
-    "idlMetadataAddress": "Aeq8wn98bJkrHu8Nxj4DoEn6Q1tQuftWp8ozH71uvKYc",
+    "address": "CceJJ1LXS13HDMJRVdhw8GEw42r3roULbX5kCABG6K8E",
+    "programDataAddress": "9KvwHbfctqoYBSoD83DLEviVU5CMTm68R3U3BMQsDSF2",
     "upgradeAuthority": "6epHJMDaqdoYVwJFU8VfVXFxzrjccESwJcM9FtS7E4Vp",
-    "lastDeployedSlot": 508428062
+    "lastDeployedSlot": 510344253
   },
   "config": {
-    "address": "9C7pFCsuX1euSuLb4rMTtUMZzKiqBwXuFjDiHJj8pno3",
+    "address": "CmvvwsZvwwbc2RXtafeDhBYoZNBsiyN2YdSBn3J8x7Lf",
     "admin": "6epHJMDaqdoYVwJFU8VfVXFxzrjccESwJcM9FtS7E4Vp",
-    "oracle": "4yyX9nQ7SU7NLDZwPymsAHLyF4MTVugKZktNySuQtY9t",
+    "oracle": "9DjxaFgSexfb2J4Rz6xvdc5iAr8LqapfyeDJprpvZFqB",
     "bump": 255,
-    "initializeTransaction": "3hDbppMRB77QMsAJW5cXBWkg6h4XeVFafRXMffFGzsf5FfSP6BAwAhysfcj38WSBvAVRsDwo1uqpbwrEbVVSVqpk"
+    "initializeTransaction": "2Sm5XKxZ3ey7xhHCSvMvMLrMcfXEVJzwempmi64KWMic1LbDtKcK9PqpPv9mddmv6rPzdW6y3R39eX3RSgBz5Uj5"
   },
   "tokens": {
     "aUsdcMint": "67tawTkJ6Ft2k7SJER8KuP1aQBbgdZMrFyJfUJT7tzZU",
     "decimals": 6,
     "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-    "mintAuthority": "6epHJMDaqdoYVwJFU8VfVXFxzrjccESwJcM9FtS7E4Vp"
+    "mintAuthority": "CwAQT623MDsWoTMkGZkfBcM81eSZYU6wafQ4oXZUsStx"
   }
 }

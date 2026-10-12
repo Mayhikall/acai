@@ -1,3 +1,4 @@
+import bs58 from "bs58";
 import fs from "node:fs/promises";
 import {
   AccountRole,
@@ -40,30 +41,40 @@ function rpcClient() {
 }
 
 async function loadOracleSigner() {
-  const keypairPath = required("ORACLE_KEYPAIR_PATH");
-  if (cachedSigner && cachedSignerPath === keypairPath) return cachedSigner;
-  const stat = await fs.stat(keypairPath);
-  if ((stat.mode & 0o077) !== 0)
-    throw new Error(
-      "ORACLE_KEYPAIR_PATH must not be readable by group or others (chmod 600)"
-    );
-  const parsed = JSON.parse(await fs.readFile(keypairPath, "utf8"));
+  if (cachedSigner) return cachedSigner;
+  let parsed;
+  const secret = process.env.ORACLE_KEYPAIR_SECRET;
+  if (secret) {
+    const raw = secret.trim();
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      parsed = Array.from(bs58.decode(raw));
+    }
+  } else {
+    const keypairPath = required("ORACLE_KEYPAIR_PATH");
+    const stat = await fs.stat(keypairPath);
+    if ((stat.mode & 0o077) !== 0)
+      throw new Error(
+        "ORACLE_KEYPAIR_PATH must not be readable by group or others (chmod 600)"
+      );
+    parsed = JSON.parse(await fs.readFile(keypairPath, "utf8"));
+  }
   if (
     !Array.isArray(parsed) ||
     parsed.length !== 64 ||
     parsed.some((byte) => !Number.isInteger(byte) || byte < 0 || byte > 255)
   )
     throw new Error(
-      "ORACLE_KEYPAIR_PATH must contain a Solana 64-byte keypair JSON array"
+      "Oracle keypair must contain a Solana 64-byte keypair JSON array"
     );
   cachedSigner = await createKeyPairSignerFromBytes(Uint8Array.from(parsed));
   if (
     process.env.ORACLE_REPORTER &&
     process.env.ORACLE_REPORTER !== cachedSigner.address
   )
-    throw new Error("ORACLE_REPORTER does not match ORACLE_KEYPAIR_PATH");
+    throw new Error("ORACLE_REPORTER does not match Oracle keypair");
   process.env.ORACLE_REPORTER = cachedSigner.address;
-  cachedSignerPath = keypairPath;
   return cachedSigner;
 }
 

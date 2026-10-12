@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-vault = "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy"
+vault = "CceJJ1LXS13HDMJRVdhw8GEw42r3roULbX5kCABG6K8E"
 
 [provider]
 cluster = "devnet"

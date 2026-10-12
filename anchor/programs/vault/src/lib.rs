@@ -12,7 +12,7 @@ mod runtime_tests;
 #[cfg(test)]
 mod tests;
 
-declare_id!("5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy");
+declare_id!("CceJJ1LXS13HDMJRVdhw8GEw42r3roULbX5kCABG6K8E");
 
 #[program]
 pub mod vault {
