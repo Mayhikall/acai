@@ -1,0 +1,51 @@
+.brand {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1;
+}
+.onLight {
+  padding: 8px 10px;
+  background: #101012;
+  border-radius: 8px;
+}
+.lockup {
+  position: relative;
+  display: block;
+  width: 132px;
+  aspect-ratio: 1325 / 353;
+  overflow: hidden;
+}
+.image {
+  position: absolute;
+  display: block;
+  max-width: none;
+  height: auto;
+}
+/* Frame the supplied artwork without changing the original image files. */
+.lockup .image {
+  width: 133.89%;
+  left: -17.74%;
+  top: -74.22%;
+}
+.lockup.small {
+  width: 92px;
+}
+.symbol {
+  position: relative;
+  display: block;
+  width: 29px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #000;
+}
+.symbol .image {
+  width: 140%;
+  left: -20%;
+  top: -20%;
+}
+.symbol.small {
+  width: 24px;
+}

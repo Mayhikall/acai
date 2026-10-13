@@ -75,7 +75,7 @@ export function StartDialog({
               "[ ] Save the published link and analytics",
             ]),
         "",
-        "Prepared with the Prism landing-page planner. This file has not been submitted or sent to anyone.",
+        "Prepared with the Acai landing-page planner. This file has not been submitted or sent to anyone.",
       ].join("\n");
       await new Promise<void>((resolve) => window.setTimeout(resolve, 350));
       if (!activeRef.current) return;

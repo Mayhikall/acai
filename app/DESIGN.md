@@ -1,4 +1,23 @@
-# Prism landing page
+# Acai landing page
+
+## Supplied Acai branding, 13 October 2026
+
+The user supplied the final purple standalone symbol and transparent white Acai wordmark. The complete lockup replaces text placeholders in the landing header, footer, phone preview, and dashboard sidebar/mobile menu. Small brand positions use the standalone symbol. White lettering is placed on a dark backing on light surfaces. CSS frames the padding around the original images; the supplied artwork is preserved. `app/icon.png` uses the standalone symbol for the site icon and small brand marks.
+
+Removed the eight unused botanical JPG/MP4 assets, the unused Instrument Serif font, their obsolete media route, and the old P favicon. The two local Barlow fonts remain in use. Earlier notes below describe the visual history before the supplied logo was added.
+
+## Acai dashboard, 13 October 2026
+
+Local route: `/dashboard`. The supplied 21st.dev dashboard screenshot informs the charcoal sidebar, compact header, thin panel borders, and performance composition. TryBuzzer informs campaign discovery and the clipper workflow. The Acai PRD defines creator/clipper roles, YouTube submissions, CPM, approval, and aUSDC examples. This screen helps a clipper choose a brief and organize their next video.
+
+- Palette: canvas `#101012`, sidebar `#171719`, panels `#18181B`, border `#2D2D32`, text `#F5F4F7`, lavender `#B49AFF`. Lavender marks selected navigation and primary actions. Muted category artwork distinguishes sample briefs; green and amber denote approval and review.
+- Typography: the existing local Barlow provides compact dashboard labels and readable numbers. Acai is a text wordmark, not a new final logo. Campaign initials and artwork are explicitly sample content.
+- Composition: left-aligned overview leads to a views trend and campaign earnings, then campaign discovery and submission status. Metrics are derived from the labeled sample submissions. The chart uses an independently labeled illustrative daily series, with an example $3 CPM for the earnings toggle.
+- Interactions: five working workspace sections, global search, category/status filters, 7/14/30-day chart periods, keyboard-focusable chart points, campaign briefs, validated YouTube draft form, draft details/removal, CSV export, local name editing, help, and confirmed local reset. Drafts and display name persist in browser storage; unavailable storage and corrupt data have explicit feedback.
+- Boundaries: frontend demo only. It does not submit to a backend, connect a wallet, authenticate YouTube, verify views, approve content, or pay rewards. aUSDC is a mock token per the PRD. The visible demo notice and help explain these limits.
+- Responsive: four campaign cards on wide desktops, two at intermediate widths, one on narrow phones. Statistics reflow to two columns; charts stack; the sidebar becomes a native modal menu. The submission table scrolls within its panel, independently of the page. Native dialogs handle keyboard focus and Escape.
+- Motion: ENERGY 2 / RHYTHM 2 / MOTION 1. Short hover and selection feedback only; reduced motion disables transitions. No particle animation in the data workspace.
+- Scope: source files under `app`, existing dependencies, and local preview only. Existing landing page now uses the Acai name and links to the dashboard. Earlier design notes below describe the landing page's history.
 
 ## TryBuzzer reference redesign, 10 October 2026
 

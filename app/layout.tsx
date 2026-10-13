@@ -12,9 +12,9 @@ const barlow = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Prism | Your next clip starts here",
+  title: "Acai | Your next clip starts here",
   description:
-    "Explore the creator workflow, calculate example earnings, and plan your next clip or brand campaign with Prism.",
+    "Explore the creator workflow, calculate example earnings, and plan your next clip or brand campaign with Acai.",
 };
 
 export default function RootLayout({
