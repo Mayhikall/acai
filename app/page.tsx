@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   Check,
@@ -21,6 +22,7 @@ import {
 import { Hero, type Audience } from "@/app/components/ui/hero-1";
 import { EarningsCalculator } from "@/app/components/landing/earnings-calculator";
 import { StartDialog } from "@/app/components/landing/start-dialog";
+import { AcaiLogo } from "@/app/components/acai-logo";
 
 const navigation = [
   ["How it works", "how-it-works"],
@@ -165,8 +167,8 @@ export default function Home() {
         Skip to content
       </a>
       <header className="site-header page-container">
-        <a className="wordmark" href="#home" aria-label="Prism home">
-          Prism<span>.</span>
+        <a className="wordmark" href="#home" aria-label="Acai home">
+          <AcaiLogo />
         </a>
         <nav className="desktop-nav" aria-label="Main navigation">
           {navigation.map(([label, id]) => (
@@ -176,9 +178,9 @@ export default function Home() {
           ))}
         </nav>
         <div className="header-actions">
-          <a className="header-explore" href="#creators">
-            For creators
-          </a>
+          <Link className="header-explore" href="/dashboard">
+            Dashboard
+          </Link>
           <button
             className="action-button action-button-small"
             onClick={() => openStart("creator")}
@@ -207,6 +209,9 @@ export default function Home() {
               {label}
             </a>
           ))}
+          <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
+            Dashboard
+          </Link>
           <a href="#creators" onClick={() => setMenuOpen(false)}>
             For creators
           </a>
@@ -508,7 +513,7 @@ export default function Home() {
                 </dl>
                 <div className="brief-preview-bottom">
                   <span className="brief-initial" aria-hidden="true">
-                    P
+                    <AcaiLogo symbolOnly small />
                   </span>
                   <span>Your brand. A creator’s perspective.</span>
                 </div>
@@ -582,10 +587,10 @@ export default function Home() {
                 <div className="phone-content" aria-live="polite">
                   <div className="phone-header">
                     <span className="wordmark">
-                      Prism<span>.</span>
+                      <AcaiLogo small onLight />
                     </span>
                     <span className="phone-avatar" aria-hidden="true">
-                      P
+                      <AcaiLogo symbolOnly small />
                     </span>
                   </div>
                   <p className="phone-greeting">Let’s make something.</p>
@@ -749,8 +754,8 @@ export default function Home() {
       <footer className="site-footer page-container">
         <div className="footer-top">
           <div className="footer-brand">
-            <a href="#home" className="wordmark">
-              Prism<span>.</span>
+            <a href="#home" className="wordmark" aria-label="Acai home">
+              <AcaiLogo onLight />
             </a>
             <p>
               A place for content ideas
@@ -759,6 +764,7 @@ export default function Home() {
             </p>
           </div>
           <nav aria-label="Footer navigation">
+            <Link href="/dashboard">Dashboard</Link>
             <a href="#creators">For creators</a>
             <a href="#brands">For brands</a>
             <a href="#campaigns">Campaign categories</a>
@@ -770,7 +776,7 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <p>
-            © 2026 Prism. A creator-platform concept. Calculations and workspace
+            © 2026 Acai. A creator-platform concept. Calculations and workspace
             content are examples.
           </p>
           <a
