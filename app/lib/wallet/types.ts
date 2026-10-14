@@ -15,7 +15,9 @@ export type WalletConnectorMetadata = {
 export type WalletSession = {
   account: WalletAccount;
   connector: WalletConnectorMetadata;
+  supportedTransactionVersions: readonly ("legacy" | 0 | 1)[];
   disconnect: () => Promise<void>;
+  signMessage?: (message: Uint8Array) => Promise<Uint8Array>;
   signTransaction?: (
     transaction: Uint8Array,
     chain: string

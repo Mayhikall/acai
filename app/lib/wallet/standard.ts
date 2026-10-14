@@ -9,6 +9,8 @@ import {
 import {
   SolanaSignTransaction,
   SolanaSignAndSendTransaction,
+  SolanaSignMessage,
+  type SolanaSignMessageFeature,
   type SolanaSignTransactionFeature,
   type SolanaSignAndSendTransactionFeature,
 } from "@solana/wallet-standard-features";
@@ -54,10 +56,25 @@ function createConnector(wallet: StandardWallet): WalletConnector {
 
       const hasSendTx = SolanaSignAndSendTransaction in wallet.features;
       const hasSignTx = SolanaSignTransaction in wallet.features;
+      const hasSignMessage = SolanaSignMessage in wallet.features;
+      const supportedTransactionVersions = hasSignTx
+        ? (
+            wallet.features[
+              SolanaSignTransaction
+            ] as SolanaSignTransactionFeature[typeof SolanaSignTransaction]
+          ).supportedTransactionVersions
+        : hasSendTx
+          ? (
+              wallet.features[
+                SolanaSignAndSendTransaction
+              ] as SolanaSignAndSendTransactionFeature[typeof SolanaSignAndSendTransaction]
+            ).supportedTransactionVersions
+          : [];
 
       const session: WalletSession = {
         account: walletAccount,
         connector: metadata,
+        supportedTransactionVersions,
         disconnect: async () => {
           if (StandardDisconnect in wallet.features) {
             const feature = wallet.features[
@@ -66,6 +83,24 @@ function createConnector(wallet: StandardWallet): WalletConnector {
             await feature.disconnect();
           }
         },
+        signMessage: hasSignMessage
+          ? async (message: Uint8Array) => {
+              const feature = wallet.features[
+                SolanaSignMessage
+              ] as SolanaSignMessageFeature[typeof SolanaSignMessage];
+              const [result] = await feature.signMessage({ account, message });
+              const signedMessage = new Uint8Array(result.signedMessage);
+              if (
+                signedMessage.length !== message.length ||
+                signedMessage.some((byte, index) => byte !== message[index])
+              ) {
+                throw new Error(
+                  "The wallet changed the sign-in message. Please use a wallet that supports standard message signing."
+                );
+              }
+              return new Uint8Array(result.signature);
+            }
+          : undefined,
         signTransaction: hasSignTx
           ? async (transaction: Uint8Array, chain: string) => {
               const feature = wallet.features[

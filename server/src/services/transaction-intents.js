@@ -5,14 +5,20 @@ import {
   getProgramDerivedAddress,
 } from "@solana/kit";
 
-const DEFAULT_PROGRAM_ID = "5qjmvHtiiMPS4U9HsodyUhMw297WsRmSpqeesEZgcupy";
+export const DEVNET_PROGRAM_ID = "CceJJ1LXS13HDMJRVdhw8GEw42r3roULbX5kCABG6K8E";
 const SYSTEM_PROGRAM = "11111111111111111111111111111111";
 const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 const ASSOCIATED_TOKEN_PROGRAM = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 const RENT_SYSVAR = "SysvarRent111111111111111111111111111111111";
 
-export const vaultProgramId = () =>
-  process.env.VAULT_PROGRAM_ID || DEFAULT_PROGRAM_ID;
+export const vaultProgramId = () => {
+  const configured = process.env.VAULT_PROGRAM_ID || DEVNET_PROGRAM_ID;
+  try {
+    return address(configured);
+  } catch {
+    throw new Error("VAULT_PROGRAM_ID must be a valid Solana address");
+  }
+};
 
 const textSeed = (value) => getBytesEncoder().encode(Buffer.from(value));
 const addressSeed = (value) => getAddressEncoder().encode(address(value));
@@ -53,7 +59,7 @@ function intent(instructions, signer) {
     format: "acai-transaction-intent-v1",
     programId: vaultProgramId(),
     feePayer: signer,
-    transactionVersion: Number(process.env.SOLANA_TRANSACTION_VERSION || 1),
+    transactionVersion: Number(process.env.SOLANA_TRANSACTION_VERSION || 0),
     instructions,
   };
 }
@@ -172,11 +178,7 @@ export async function buildClaimIntent({
   );
 }
 
-export async function buildRefundIntent({
-  campaign,
-  creator,
-  mint,
-}) {
+export async function buildRefundIntent({ campaign, creator, mint }) {
   const vault = await deriveVaultAddress(campaign);
   const creatorTokenAccount = await deriveAtaAddress(creator, mint);
   return intent(
@@ -260,5 +262,58 @@ export async function buildRejectSubmissionIntent({
       },
     ],
     creator
+  );
+}
+
+export async function buildTopUpIntent({ campaign, creator, mint, amount }) {
+  const vault = await deriveVaultAddress(campaign);
+  const creatorTokenAccount = await deriveAtaAddress(creator, mint);
+  return intent(
+    [
+      {
+        name: "top_up",
+        accounts: {
+          campaign,
+          vault,
+          creatorTokenAccount,
+          mint,
+          creator,
+          tokenProgram: TOKEN_PROGRAM,
+        },
+        args: { amount: String(amount) },
+      },
+    ],
+    creator
+  );
+}
+
+export async function buildAppealSubmissionIntent({
+  campaign,
+  submission,
+  clipper,
+}) {
+  const stats = await deriveStatsAddress(campaign, clipper);
+  return intent(
+    [
+      {
+        name: "appeal_submission",
+        accounts: { campaign, submission, stats, clipper },
+        args: {},
+      },
+    ],
+    clipper
+  );
+}
+
+export function buildFinalizeTimeoutIntent({ campaign, submission, signer }) {
+  return intent(
+    [
+      {
+        name: "finalize_timeout",
+        accounts: { campaign, submission },
+        args: {},
+      },
+    ],
+    signer
   );
 }

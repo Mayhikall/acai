@@ -3,6 +3,19 @@ import { createApp } from "./app.js";
 import { closeDatabase } from "./db/index.js";
 import { startMaintenanceWorker } from "./services/maintenance-worker.js";
 import { startChainIndexer } from "./services/chain-indexer.js";
+import {
+  DEVNET_PROGRAM_ID,
+  vaultProgramId,
+} from "./services/transaction-intents.js";
+
+if (
+  (process.env.SOLANA_CLUSTER || "devnet") === "devnet" &&
+  vaultProgramId() !== DEVNET_PROGRAM_ID
+) {
+  throw new Error(
+    `VAULT_PROGRAM_ID does not match the active Devnet deployment (${DEVNET_PROGRAM_ID})`
+  );
+}
 
 const stopMaintenance = startMaintenanceWorker(console);
 const stopIndexer = startChainIndexer(console);

@@ -23,11 +23,20 @@ export async function purgeExpiredPlatformData(now = new Date()) {
   return { deletedSnapshots };
 }
 
+export async function expireUnsignedCampaignIntents(now = new Date()) {
+  const expired = await db("campaign_intents")
+    .where({ status: "AWAITING_SIGNATURE" })
+    .andWhere("expires_at", "<=", now)
+    .update({ status: "EXPIRED", updated_at: db.fn.now() });
+  return { expired };
+}
+
 export async function runMaintenanceCycle() {
   if (running) return { skipped: "already-running" };
   running = true;
   try {
     const result = {};
+    result.campaignIntents = await expireUnsignedCampaignIntents();
     if (process.env.ORACLE_WORKER_ENABLED === "true") {
       result.retries = await retryFailedOracleReports();
       result.oracle = await runOracle({ reason: "schedule" });

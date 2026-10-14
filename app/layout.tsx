@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Providers } from "./components/providers";
 import "./globals.css";
 
 const barlow = localFont({
@@ -14,7 +15,7 @@ const barlow = localFont({
 export const metadata: Metadata = {
   title: "Acai | Your next clip starts here",
   description:
-    "Explore the creator workflow, calculate example earnings, and plan your next clip or brand campaign with Acai.",
+    "Create, fund, and grow YouTube clip campaigns with one wallet on Acai.",
 };
 
 export default function RootLayout({
@@ -23,8 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={barlow.variable}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={barlow.variable}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Check,
@@ -26,8 +27,9 @@ import { AcaiLogo } from "@/app/components/acai-logo";
 
 const navigation = [
   ["How it works", "how-it-works"],
-  ["Browse campaigns", "campaigns"],
-  ["For brands", "brands"],
+  ["For clippers", "creators"],
+  ["For creators", "brands"],
+  ["FAQ", "faq"],
 ] as const;
 
 const steps = [
@@ -109,18 +111,19 @@ const questions = [
       "Eligibility depends on the campaign. Read the brief for supported platforms, account requirements, and content guidelines before making a clip. A clear hook and a relevant story are useful at any audience size.",
   },
   {
-    question: "What should a brand include in a campaign brief?",
+    question: "What should a creator include in a campaign brief?",
     answer:
       "Start with the audience, the message, and the kind of content you want. Include source materials, usage permissions, required mentions, deadlines, budget, and the rules for reviewing views and paying creators.",
   },
   {
     question: "What happens when I choose Get Started?",
     answer:
-      "You can prepare a creator plan or a brand campaign brief and download it as a text file. This landing-page planner does not create an account, publish a campaign, submit content, or process a payment.",
+      "You can prepare a clip plan or campaign brief locally. To use the actual product, open Acai and connect one wallet for either workspace.",
   },
 ];
 
 export default function Home() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [paused, setPaused] = useState(true);
   const [start, setStart] = useState<{
@@ -178,15 +181,12 @@ export default function Home() {
           ))}
         </nav>
         <div className="header-actions">
-          <Link className="header-explore" href="/dashboard">
-            Dashboard
-          </Link>
-          <button
+          <Link
             className="action-button action-button-small"
-            onClick={() => openStart("creator")}
+            href="/connect?next=/dashboard"
           >
-            Get Started
-          </button>
+            Open Acai
+          </Link>
         </div>
         <button
           ref={menuButtonRef}
@@ -209,18 +209,16 @@ export default function Home() {
               {label}
             </a>
           ))}
-          <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
-            Dashboard
-          </Link>
           <a href="#creators" onClick={() => setMenuOpen(false)}>
-            For creators
+            For clippers
           </a>
-          <button
+          <Link
             className="action-button"
-            onClick={() => openStart("creator")}
+            href="/connect?next=/dashboard"
+            onClick={() => setMenuOpen(false)}
           >
-            Get Started
-          </button>
+            Open Acai
+          </Link>
         </nav>
       </header>
 
@@ -242,7 +240,14 @@ export default function Home() {
                 Explore what your content could earn.
               </>
             }
-            onGetStarted={(audience) => openStart(audience)}
+            ctaLabel="Open Acai"
+            onGetStarted={(audience) =>
+              router.push(
+                audience === "brand"
+                  ? "/connect?next=/dashboard/creator"
+                  : "/connect?next=/dashboard/clipper/campaigns"
+              )
+            }
             paused={paused || start !== null}
           />
           <button
@@ -479,14 +484,14 @@ export default function Home() {
 
             <article className="feature-card brand-card" id="brands">
               <div className="feature-copy">
-                <p className="section-kicker">For brands</p>
+                <p className="section-kicker">For creators</p>
                 <h3>
                   Better content begins
                   <br />
                   with a better brief.
                 </h3>
                 <p>
-                  Give creators a clear direction and room to make it their own.
+                  Give clippers a clear direction and room to make it their own.
                   Start with the audience, the message, and what success looks
                   like.
                 </p>
@@ -515,7 +520,7 @@ export default function Home() {
                   <span className="brief-initial" aria-hidden="true">
                     <AcaiLogo symbolOnly small />
                   </span>
-                  <span>Your brand. A creator’s perspective.</span>
+                  <span>Your campaign. A clipper’s perspective.</span>
                 </div>
               </div>
               <button
@@ -544,8 +549,8 @@ export default function Home() {
                 Your next move.
               </h2>
               <p>
-                Keep the brief close while you create. Preview a creator
-                workspace or see the campaign from a brand’s side.
+                Keep the brief close while you create. Preview the clipper
+                workspace or see the campaign from a creator’s side.
               </p>
               <div
                 className="audience-tabs"
@@ -563,7 +568,7 @@ export default function Home() {
                   className={previewAudience === "brand" ? "is-active" : ""}
                   onClick={() => setPreviewAudience("brand")}
                 >
-                  Brand view
+                  Creator campaign
                 </button>
               </div>
               <button
@@ -764,21 +769,20 @@ export default function Home() {
             </p>
           </div>
           <nav aria-label="Footer navigation">
-            <Link href="/dashboard">Dashboard</Link>
-            <a href="#creators">For creators</a>
-            <a href="#brands">For brands</a>
+            <Link href="/connect?next=/dashboard">Open Acai</Link>
+            <a href="#creators">For clippers</a>
+            <a href="#brands">For creators</a>
             <a href="#campaigns">Campaign categories</a>
             <a href="#faq">FAQ</a>
+            <Link href="/privacy">Privacy policy</Link>
+            <Link href="/terms">Terms of service</Link>
           </nav>
           <a className="footer-back" href="#home">
             Back to top ↑
           </a>
         </div>
         <div className="footer-bottom">
-          <p>
-            © 2026 Acai. A creator-platform concept. Calculations and workspace
-            content are examples.
-          </p>
+          <p>© 2026 Acai. Devnet campaign rewards for creators and clippers.</p>
           <a
             href="https://www.trybuzzer.com/en"
             target="_blank"

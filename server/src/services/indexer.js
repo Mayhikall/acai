@@ -5,6 +5,30 @@ import { deriveSubmissionAddress } from "./transaction-intents.js";
 
 const asDate = (seconds) => new Date(Number(seconds) * 1000);
 
+export function assertCampaignIntentMatchesEvent(intent, payload, txSignature) {
+  const data = intent.campaign_data;
+  const mismatches = [
+    [payload.creator, intent.creator_wallet],
+    [String(payload.budget), String(data.budget)],
+    [String(payload.cpm), String(data.cpm)],
+    [String(payload.max_payout_per_video), String(data.max_payout_per_video)],
+    [String(payload.start_time), String(data.start_time)],
+    [String(payload.end_time), String(data.end_time)],
+  ];
+  if (mismatches.some(([actual, expected]) => actual !== expected))
+    throw new AppError(
+      409,
+      "CAMPAIGN_INTENT_MISMATCH",
+      "Finalized campaign does not match its verified intent"
+    );
+  if (intent.tx_signature && intent.tx_signature !== txSignature)
+    throw new AppError(
+      409,
+      "CAMPAIGN_SIGNATURE_MISMATCH",
+      "Finalized transaction does not match the submitted signature"
+    );
+}
+
 async function findSubmission(trx, payload) {
   const query = trx("submissions");
   if (payload.submission)
@@ -37,7 +61,36 @@ export async function processIndexerEvent({
     if (!inserted.length) return { duplicate: true };
     let affectedSubmissionId = null;
 
-    if (eventName === "SubmissionRegistered") {
+    if (eventName === "CampaignInitialized") {
+      const campaignId = String(payload.campaign_id);
+      const intent = await trx("campaign_intents")
+        .where({ campaign_id: campaignId })
+        .first();
+      if (!intent)
+        throw new AppError(
+          409,
+          "CAMPAIGN_INTENT_MISSING",
+          "No campaign intent matches the finalized event"
+        );
+      assertCampaignIntentMatchesEvent(intent, payload, txSignature);
+      await trx("campaigns")
+        .insert({
+          id: campaignId,
+          ...intent.campaign_data,
+          terms_file_path: intent.terms_file_path,
+          terms_hash: intent.terms_hash,
+          creator_wallet: intent.creator_wallet,
+          onchain_campaign: intent.onchain_campaign,
+          status: "PENDING_FUNDING",
+        })
+        .onConflict("id")
+        .ignore();
+      await trx("campaign_intents").where({ campaign_id: campaignId }).update({
+        status: "INITIALIZED",
+        tx_signature: txSignature,
+        updated_at: trx.fn.now(),
+      });
+    } else if (eventName === "SubmissionRegistered") {
       const intent = await trx("submission_intents")
         .where({
           campaign_id: String(payload.campaign_id),
@@ -201,9 +254,36 @@ export async function processIndexerEvent({
           .update({ status: "DONE", updated_at: trx.fn.now() });
       }
     } else if (eventName === "CampaignFunded") {
+      const campaignId = String(payload.campaign_id);
+      const intent = await trx("campaign_intents")
+        .where({ campaign_id: campaignId })
+        .first();
+      const campaign = await trx("campaigns").where({ id: campaignId }).first();
+      if (!intent || !campaign)
+        throw new AppError(
+          409,
+          "CAMPAIGN_INITIALIZATION_MISSING",
+          "Campaign funding was finalized without a matching initialization"
+        );
+      if (
+        payload.creator !== campaign.creator_wallet ||
+        String(payload.amount) !== String(campaign.budget) ||
+        (intent.tx_signature && intent.tx_signature !== txSignature)
+      )
+        throw new AppError(
+          409,
+          "CAMPAIGN_FUNDING_MISMATCH",
+          "Finalized campaign funding does not match its verified intent"
+        );
       await trx("campaigns")
-        .where({ id: String(payload.campaign_id) })
-        .update({ status: "FUNDED", total_funded: String(payload.amount) });
+        .where({ id: campaignId })
+        .update({
+          status: "FUNDED",
+          total_funded: String(payload.amount),
+        });
+      await trx("campaign_intents")
+        .where({ campaign_id: campaignId })
+        .update({ status: "FINALIZED", updated_at: trx.fn.now() });
     } else if (eventName === "CampaignToppedUp") {
       await trx("campaigns")
         .where({ id: String(payload.campaign_id) })

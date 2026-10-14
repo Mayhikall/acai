@@ -1,3 +1,9 @@
+import crypto from "node:crypto";
+
+export function createAuthNonce() {
+  return crypto.randomBytes(16).toString("hex");
+}
+
 export function createSignInMessage({
   domain,
   uri,
@@ -11,7 +17,7 @@ export function createSignInMessage({
     `${domain} wants you to sign in with your Solana account:`,
     wallet,
     "",
-    "Sign in to Acai",
+    "Sign in to Acai. This request is free and does not create a transaction.",
     "",
     `URI: ${uri}`,
     "Version: 1",

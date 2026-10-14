@@ -52,7 +52,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
     WALLET_STATUS.DISCONNECTED
   );
   const [error, setError] = useState<unknown>();
-  const isReady = typeof window !== "undefined";
+  const [isReady, setIsReady] = useState(false);
 
   const connectorsRef = useRef<WalletConnector[]>(connectors);
   const autoConnectAttempted = useRef(false);
@@ -75,6 +75,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => {
+    let active = true;
     const unsubscribe = watchWallets(handleWalletsChanged);
 
     const lastId = localStorage.getItem(STORAGE_KEY);
@@ -82,11 +83,20 @@ export function WalletProvider({ children }: PropsWithChildren) {
       autoConnectAttempted.current = true;
       const connector = connectorsRef.current.find((c) => c.id === lastId);
       if (connector) {
-        void runAutoConnect(connector);
+        void runAutoConnect(connector).finally(() => {
+          if (active) setIsReady(true);
+        });
+      } else {
+        setIsReady(true);
       }
+    } else {
+      setIsReady(true);
     }
 
-    return unsubscribe;
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, [handleWalletsChanged, runAutoConnect]);
 
   const connect = useCallback(async (connectorId: string) => {

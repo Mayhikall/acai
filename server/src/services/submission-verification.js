@@ -55,9 +55,12 @@ export async function verifySubmission({ campaign, wallet, videoId }) {
       "Video must be 180 seconds or shorter"
     );
   const publishedAt = Math.floor(new Date(video.publishedAt).getTime() / 1000);
+  const allowPastVideos = process.env.ALLOW_PAST_VIDEOS === "true";
+  const publishedBeforeStart =
+    !allowPastVideos && publishedAt < Number(campaign.start_time);
   if (
     !Number.isFinite(publishedAt) ||
-    publishedAt < Number(campaign.start_time) ||
+    publishedBeforeStart ||
     publishedAt > nowSeconds ||
     publishedAt > Number(campaign.end_time)
   )
@@ -66,7 +69,10 @@ export async function verifySubmission({ campaign, wallet, videoId }) {
       "INVALID_PUBLISH_TIME",
       "Video was published outside the campaign window"
     );
-  if (!video.description.includes(campaign.required_mention))
+  if (
+    !allowPastVideos &&
+    !video.description.includes(campaign.required_mention)
+  )
     throw new AppError(
       400,
       "MENTION_MISSING",

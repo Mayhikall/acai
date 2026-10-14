@@ -18,6 +18,11 @@ function normalizeVideo(item) {
     videoId: item.id,
     channelId: item.snippet?.channelId ?? "",
     title: item.snippet?.title ?? "",
+    thumbnailUrl:
+      item.snippet?.thumbnails?.high?.url ??
+      item.snippet?.thumbnails?.medium?.url ??
+      item.snippet?.thumbnails?.default?.url ??
+      "",
     description: item.snippet?.description ?? "",
     publishedAt: item.snippet?.publishedAt ?? null,
     durationSeconds: parseIsoDuration(item.contentDetails?.duration),

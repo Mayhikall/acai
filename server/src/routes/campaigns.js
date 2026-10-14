@@ -6,7 +6,11 @@ import { db } from "../db/index.js";
 import { requireAuth } from "../middleware/auth.js";
 import { AppError, asyncHandler } from "../lib/errors.js";
 import { getTermsUrl, uploadTerms } from "../services/terms-storage.js";
-import { buildCreateCampaignIntent, buildRefundIntent } from "../services/transaction-intents.js";
+import {
+  buildCreateCampaignIntent,
+  buildRefundIntent,
+  buildTopUpIntent,
+} from "../services/transaction-intents.js";
 
 const router = Router();
 const upload = multer({
@@ -101,16 +105,12 @@ router.post(
         { campaignId, termsHash, ...input, cpm: input.cpmBaseUnits },
         req.auth.wallet
       );
-    const row = {
-      id: campaignId,
-      creator_wallet: req.auth.wallet,
+    const campaignData = {
       title: input.title,
       brief: input.brief,
       source_video: input.sourceVideo,
       required_mention: input.requiredMention,
       payment_mint: input.paymentMint,
-      terms_file_path: termsFilePath,
-      terms_hash: termsHash,
       cpm: input.cpmBaseUnits,
       max_payout_per_video: input.maxPayoutPerVideo,
       budget: input.budget,
@@ -126,12 +126,87 @@ router.post(
       max_videos_per_clipper: input.maxVideosPerClipper,
       min_subscribers: input.minSubscribers,
       min_channel_age_days: input.minChannelAgeDays,
-      onchain_campaign: onchainCampaign,
     };
-    await db("campaigns").insert(row);
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+    await db("campaign_intents").insert({
+      campaign_id: campaignId,
+      creator_wallet: req.auth.wallet,
+      onchain_campaign: onchainCampaign,
+      terms_file_path: termsFilePath,
+      terms_hash: termsHash,
+      campaign_data: campaignData,
+      expires_at: expiresAt,
+    });
     res.status(201).json({
-      campaign: row,
+      campaignIntent: {
+        campaignId,
+        onchainCampaign,
+        status: "AWAITING_SIGNATURE",
+        expiresAt,
+      },
+      confirmation: {
+        endpoint: `/campaigns/intents/${campaignId}/submitted`,
+      },
       transaction,
+    });
+  })
+);
+
+router.post(
+  "/intents/:id/submitted",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { signature } = z
+      .object({
+        signature: z
+          .string()
+          .trim()
+          .min(64)
+          .max(88)
+          .regex(/^[1-9A-HJ-NP-Za-km-z]+$/),
+      })
+      .parse(req.body);
+    const intent = await db("campaign_intents")
+      .where({
+        campaign_id: req.params.id,
+        creator_wallet: req.auth.wallet,
+      })
+      .first();
+    if (!intent)
+      throw new AppError(
+        404,
+        "CAMPAIGN_INTENT_NOT_FOUND",
+        "Campaign intent not found"
+      );
+    if (new Date(intent.expires_at).getTime() <= Date.now())
+      throw new AppError(
+        410,
+        "CAMPAIGN_INTENT_EXPIRED",
+        "Campaign intent has expired"
+      );
+    if (intent.status === "FINALIZED") {
+      res.json({
+        campaignId: String(intent.campaign_id),
+        status: "FINALIZED",
+      });
+      return;
+    }
+    if (!["AWAITING_SIGNATURE", "SUBMITTED"].includes(intent.status))
+      throw new AppError(
+        409,
+        "CAMPAIGN_INTENT_FINALIZED",
+        "Campaign intent is already finalized"
+      );
+    await db("campaign_intents")
+      .where({ campaign_id: intent.campaign_id })
+      .update({
+        status: "SUBMITTED",
+        tx_signature: signature,
+        updated_at: db.fn.now(),
+      });
+    res.status(202).json({
+      campaignId: String(intent.campaign_id),
+      status: "SUBMITTED",
     });
   })
 );
@@ -144,6 +219,40 @@ router.get(
       .limit(Math.min(Number(req.query.limit) || 20, 100));
     if (req.query.status) query.where({ status: req.query.status });
     res.json({ campaigns: await query });
+  })
+);
+
+router.post(
+  "/:id/top-up-intent",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { amount } = z
+      .object({ amount: z.coerce.bigint().positive().transform(String) })
+      .parse(req.body);
+    const campaign = await db("campaigns").where({ id: req.params.id }).first();
+    if (!campaign)
+      throw new AppError(404, "CAMPAIGN_NOT_FOUND", "Campaign not found");
+    if (campaign.creator_wallet !== req.auth.wallet)
+      throw new AppError(
+        403,
+        "FORBIDDEN",
+        "Only the campaign creator can top up funds"
+      );
+    if (campaign.status !== "FUNDED")
+      throw new AppError(409, "INVALID_STATE", "Campaign must be funded");
+    if (Math.floor(Date.now() / 1000) > Number(campaign.end_time))
+      throw new AppError(409, "CAMPAIGN_ENDED", "Campaign has ended");
+
+    res.json({
+      campaignId: campaign.id,
+      amount,
+      transaction: await buildTopUpIntent({
+        campaign: campaign.onchain_campaign,
+        creator: req.auth.wallet,
+        mint: campaign.payment_mint,
+        amount,
+      }),
+    });
   })
 );
 
@@ -175,7 +284,6 @@ router.get(
   })
 );
 
-
 router.post(
   "/:id/refund-intent",
   requireAuth,
@@ -184,14 +292,27 @@ router.post(
     if (!campaign)
       throw new AppError(404, "CAMPAIGN_NOT_FOUND", "Campaign not found");
     if (campaign.creator_wallet !== req.auth.wallet)
-      throw new AppError(403, "FORBIDDEN", "Only the campaign creator can request a refund");
+      throw new AppError(
+        403,
+        "FORBIDDEN",
+        "Only the campaign creator can request a refund"
+      );
     if (campaign.status === "CLOSED")
-      throw new AppError(409, "CAMPAIGN_ALREADY_CLOSED", "Campaign is already closed and refunded");
+      throw new AppError(
+        409,
+        "CAMPAIGN_ALREADY_CLOSED",
+        "Campaign is already closed and refunded"
+      );
     if (campaign.status !== "FUNDED")
-      throw new AppError(400, "INVALID_STATE", "Campaign must be funded before it can be refunded");
+      throw new AppError(
+        400,
+        "INVALID_STATE",
+        "Campaign must be funded before it can be refunded"
+      );
 
     const nowSeconds = Math.floor(Date.now() / 1000);
-    const eligibleAt = Number(campaign.end_time) + Number(campaign.settlement_period);
+    const eligibleAt =
+      Number(campaign.end_time) + Number(campaign.settlement_period);
     if (nowSeconds <= eligibleAt) {
       throw new AppError(
         400,

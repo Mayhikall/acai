@@ -10,7 +10,9 @@ import { verifySubmission } from "../services/submission-verification.js";
 import { runOracle } from "../services/oracle-worker.js";
 import {
   buildAcceptSubmissionIntent,
+  buildAppealSubmissionIntent,
   buildClaimIntent,
+  buildFinalizeTimeoutIntent,
   buildRegisterSubmissionIntent,
   buildRejectSubmissionIntent,
   deriveVaultAddress,
@@ -171,15 +173,41 @@ router.post(
   asyncHandler(async (req, res) => {
     const submission = await db("submissions as s")
       .join("campaigns as c", "c.id", "s.campaign_id")
-      .select("s.*", "c.creator_wallet", "c.onchain_campaign")
+      .select(
+        "s.*",
+        "c.creator_wallet",
+        "c.onchain_campaign",
+        "c.appeal_timeout"
+      )
       .where("s.id", req.params.id)
       .first();
     if (!submission)
       throw new AppError(404, "SUBMISSION_NOT_FOUND", "Submission not found");
     if (submission.creator_wallet !== req.auth.wallet)
-      throw new AppError(403, "FORBIDDEN", "Only campaign creator can accept submissions");
-    if (submission.status !== "PENDING_REVIEW")
-      throw new AppError(400, "INVALID_STATE", `Submission is already ${submission.status}`);
+      throw new AppError(
+        403,
+        "FORBIDDEN",
+        "Only campaign creator can accept submissions"
+      );
+    const isInitialReview = submission.status === "PENDING_REVIEW";
+    const isAppealReview =
+      submission.status === "REJECTED" && Boolean(submission.appealed_at);
+    if (!isInitialReview && !isAppealReview)
+      throw new AppError(
+        400,
+        "INVALID_STATE",
+        `Submission is already ${submission.status}`
+      );
+    const deadline = isInitialReview
+      ? new Date(submission.review_deadline).getTime()
+      : new Date(submission.appealed_at).getTime() +
+        Number(submission.appeal_timeout) * 1000;
+    if (Date.now() > deadline)
+      throw new AppError(
+        409,
+        "REVIEW_DEADLINE_PASSED",
+        "The on-chain review deadline has passed"
+      );
 
     const transaction = await buildAcceptSubmissionIntent({
       campaign: submission.onchain_campaign,
@@ -207,15 +235,41 @@ router.post(
 
     const submission = await db("submissions as s")
       .join("campaigns as c", "c.id", "s.campaign_id")
-      .select("s.*", "c.creator_wallet", "c.onchain_campaign")
+      .select(
+        "s.*",
+        "c.creator_wallet",
+        "c.onchain_campaign",
+        "c.appeal_timeout"
+      )
       .where("s.id", req.params.id)
       .first();
     if (!submission)
       throw new AppError(404, "SUBMISSION_NOT_FOUND", "Submission not found");
     if (submission.creator_wallet !== req.auth.wallet)
-      throw new AppError(403, "FORBIDDEN", "Only campaign creator can reject submissions");
-    if (submission.status !== "PENDING_REVIEW")
-      throw new AppError(400, "INVALID_STATE", `Submission is already ${submission.status}`);
+      throw new AppError(
+        403,
+        "FORBIDDEN",
+        "Only campaign creator can reject submissions"
+      );
+    const isInitialReview = submission.status === "PENDING_REVIEW";
+    const isAppealReview =
+      submission.status === "REJECTED" && Boolean(submission.appealed_at);
+    if (!isInitialReview && !isAppealReview)
+      throw new AppError(
+        400,
+        "INVALID_STATE",
+        `Submission is already ${submission.status}`
+      );
+    const deadline = isInitialReview
+      ? new Date(submission.review_deadline).getTime()
+      : new Date(submission.appealed_at).getTime() +
+        Number(submission.appeal_timeout) * 1000;
+    if (Date.now() > deadline)
+      throw new AppError(
+        409,
+        "REVIEW_DEADLINE_PASSED",
+        "The on-chain review deadline has passed"
+      );
 
     const reasonHash = crypto
       .createHash("sha256")
@@ -237,7 +291,6 @@ router.post(
     });
   })
 );
-
 
 router.post(
   "/submissions/:id/claim-request",
@@ -371,6 +424,81 @@ router.post(
       claimRequest: currentRequest,
       amount,
       transaction,
+    });
+  })
+);
+
+router.post(
+  "/submissions/:id/appeal-intent",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const submission = await db("submissions as s")
+      .join("campaigns as c", "c.id", "s.campaign_id")
+      .select("s.*", "c.onchain_campaign", "c.appeal_window")
+      .where("s.id", req.params.id)
+      .first();
+    if (!submission)
+      throw new AppError(404, "SUBMISSION_NOT_FOUND", "Submission not found");
+    if (submission.clipper_wallet !== req.auth.wallet)
+      throw new AppError(403, "FORBIDDEN", "Only the clipper can appeal");
+    if (submission.status !== "REJECTED" || submission.appealed_at)
+      throw new AppError(409, "INVALID_STATE", "Submission cannot be appealed");
+    const appealDeadline =
+      new Date(submission.rejected_at).getTime() +
+      Number(submission.appeal_window) * 1000;
+    if (!submission.rejected_at || Date.now() > appealDeadline)
+      throw new AppError(
+        409,
+        "APPEAL_WINDOW_CLOSED",
+        "Appeal window has closed"
+      );
+
+    res.json({
+      submissionId: submission.id,
+      transaction: await buildAppealSubmissionIntent({
+        campaign: submission.onchain_campaign,
+        submission: submission.onchain_submission,
+        clipper: req.auth.wallet,
+      }),
+    });
+  })
+);
+
+router.post(
+  "/submissions/:id/finalize-timeout-intent",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const submission = await db("submissions as s")
+      .join("campaigns as c", "c.id", "s.campaign_id")
+      .select("s.*", "c.onchain_campaign", "c.appeal_timeout")
+      .where("s.id", req.params.id)
+      .first();
+    if (!submission)
+      throw new AppError(404, "SUBMISSION_NOT_FOUND", "Submission not found");
+
+    const reviewExpired =
+      submission.status === "PENDING_REVIEW" &&
+      Date.now() > new Date(submission.review_deadline).getTime();
+    const appealExpired =
+      submission.status === "REJECTED" &&
+      submission.appealed_at &&
+      Date.now() >
+        new Date(submission.appealed_at).getTime() +
+          Number(submission.appeal_timeout) * 1000;
+    if (!reviewExpired && !appealExpired)
+      throw new AppError(
+        409,
+        "DEADLINE_NOT_REACHED",
+        "Submission timeout cannot be finalized yet"
+      );
+
+    res.json({
+      submissionId: submission.id,
+      transaction: buildFinalizeTimeoutIntent({
+        campaign: submission.onchain_campaign,
+        submission: submission.onchain_submission,
+        signer: req.auth.wallet,
+      }),
     });
   })
 );

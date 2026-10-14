@@ -5,7 +5,10 @@ import nacl from "tweetnacl";
 import bs58 from "bs58";
 import { z } from "zod";
 import { db } from "../db/index.js";
-import { createSignInMessage } from "../services/auth-message.js";
+import {
+  createAuthNonce,
+  createSignInMessage,
+} from "../services/auth-message.js";
 import { AppError, asyncHandler } from "../lib/errors.js";
 import { requireAuth } from "../middleware/auth.js";
 
@@ -33,7 +36,9 @@ router.post(
         "Wallet must be a Solana public key"
       );
 
-    const nonce = crypto.randomBytes(16).toString("base64url");
+    // SIWS nonces must contain only letters and digits. Hex keeps the
+    // challenge cryptographically random while remaining wallet-parseable.
+    const nonce = createAuthNonce();
     const issuedAt = new Date();
     const expirationTime = new Date(issuedAt.getTime() + 5 * 60_000);
     const domain = new URL(process.env.APP_ORIGIN || "http://localhost:3000")

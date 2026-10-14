@@ -100,7 +100,7 @@ Gunakan hasil base64 untuk `TOKEN_ENCRYPTION_KEY`. Mengubah key ini setelah toke
 | `YOUTUBE_MOCK_FIXTURE` | Adapter `mock` | Path fixture video; tidak dipakai adapter API. |
 | `SOLANA_CLUSTER` | Flow Solana | Saat ini `devnet`; juga diikat ke pesan login. |
 | `SOLANA_RPC_URL` | Indexer/oracle/init | HTTP RPC endpoint cluster yang sama dengan program. Gunakan RPC devnet yang stabil (seperti Helius). |
-| `SOLANA_TRANSACTION_VERSION` | Flow Solana | Versi transaction intent; project memakai 1. Frontend harus memeriksa dukungan wallet. |
+| `SOLANA_TRANSACTION_VERSION` | Flow Solana | Versi transaction intent; implementasi saat ini memakai `0`, sesuai planner Kit yang terpasang. Frontend tetap memeriksa dukungan wallet. |
 | `VAULT_PROGRAM_ID` | Flow Solana | Program Acai devnet yang sudah dideploy (`CceJJ1LXS13HDMJRVdhw8GEw42r3roULbX5kCABG6K8E`). |
 | `AUSDC_MINT_ADDRESS` | Campaign/faucet | Mint pembayaran yang diizinkan backend (`67tawTkJ6Ft2k7SJER8KuP1aQBbgdZMrFyJfUJT7tzZU`). |
 | `CHAIN_INDEXER_ENABLED` | Sinkronisasi otomatis | `true` menjalankan polling finalized transaction/log saat API hidup. |

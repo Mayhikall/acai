@@ -13,6 +13,7 @@ export function useSendTransaction() {
   const { cluster } = useCluster();
   const { mutate } = useSWRConfig();
   const [isSending, setIsSending] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
 
   const txClient = useMemo(
     () =>
@@ -42,5 +43,19 @@ export function useSendTransaction() {
     [txClient, mutate]
   );
 
-  return { send, isSending };
+  const simulate = useCallback(
+    async ({ instructions }: { instructions: readonly Instruction[] }) => {
+      if (!txClient) throw new Error("Wallet not connected");
+      setIsSimulating(true);
+      try {
+        await txClient.planTransaction([...instructions]);
+        return { ok: true as const };
+      } finally {
+        setIsSimulating(false);
+      }
+    },
+    [txClient]
+  );
+
+  return { send, simulate, isSending, isSimulating };
 }

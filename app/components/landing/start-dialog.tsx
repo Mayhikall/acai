@@ -111,7 +111,7 @@ export function StartDialog({
         <X size={22} />
       </button>
       <p className="section-kicker">
-        {isBrand ? "For brands" : "For creators"}
+        {isBrand ? "For creators" : "For clippers"}
       </p>
       <h2 id="start-dialog-title">
         {isBrand

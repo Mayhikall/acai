@@ -37,8 +37,8 @@ export function Hero({
           <fieldset className="creator-audience">
             <legend className="sr-only">Choose your role</legend>
             {[
-              { value: "brand", label: "I'm a Brand", icon: Building2 },
-              { value: "creator", label: "I'm a Creator", icon: UserRound },
+              { value: "brand", label: "I'm a Creator", icon: Building2 },
+              { value: "creator", label: "I'm a Clipper", icon: UserRound },
             ].map(({ value, label, icon: Icon }) => (
               <label key={value} className="creator-audience-option">
                 <input

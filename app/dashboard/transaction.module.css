@@ -1,0 +1,112 @@
+.dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(520px, calc(100% - 28px));
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  padding: 0;
+  border: 1px solid #3b3b42;
+  border-radius: 16px;
+  color: #f5f4f7;
+  background: #18181b;
+  box-shadow: 0 28px 100px #000b;
+}
+.dialog::backdrop {
+  background: #050506c7;
+  backdrop-filter: blur(4px);
+}
+.header,
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #2d2d32;
+}
+.header span {
+  color: #9d99a3;
+  font-size: 12px;
+}
+.header h2 {
+  margin-top: 4px;
+  font-size: 22px;
+}
+.header button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #38383e;
+  border-radius: 8px;
+  color: #aaa7b0;
+  background: #222225;
+}
+.body {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+}
+.notice {
+  display: flex;
+  gap: 11px;
+  padding: 13px;
+  border: 1px solid #493d56;
+  border-radius: 10px;
+  color: #cdbfda;
+  background: #211a28;
+}
+.notice p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.body dl {
+  display: grid;
+  gap: 0;
+}
+.body dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 11px 0;
+  border-bottom: 1px solid #29292e;
+}
+.body dt {
+  color: #8f8c95;
+}
+.body dd {
+  max-width: 65%;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+.error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+.error {
+  color: #f3a4ab;
+  background: #3a1c21;
+}
+.footer {
+  justify-content: flex-end;
+  border-top: 1px solid #2d2d32;
+  border-bottom: 0;
+}
+.spin {
+  animation: spin 900ms linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}

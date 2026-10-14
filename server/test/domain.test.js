@@ -1,10 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createSignInMessage } from "../src/services/auth-message.js";
+import {
+  createAuthNonce,
+  createSignInMessage,
+} from "../src/services/auth-message.js";
 import { calculateRemainingClaim } from "../src/services/claims.js";
 import { parseIsoDuration } from "../src/services/youtube/api.js";
 import { detectAnomaly } from "../src/services/oracle-worker.js";
 import { AppError } from "../src/lib/errors.js";
+import { assertCampaignIntentMatchesEvent } from "../src/services/indexer.js";
 import {
   isQuarantinableIndexerError,
   processDecodedEvents,
@@ -23,15 +27,20 @@ test("auth message binds domain, URI, chain, nonce, and expiration", () => {
     domain: "acai.test",
     uri: "https://acai.test",
     wallet: "wallet",
-    nonce: "nonce",
+    nonce: "nonce1234",
     issuedAt: "2026-01-01T00:00:00.000Z",
     expirationTime: "2026-01-01T00:05:00.000Z",
     chain: "devnet",
   });
   assert.match(message, /acai\.test wants you to sign in/);
   assert.match(message, /Chain ID: solana:devnet/);
-  assert.match(message, /Nonce: nonce/);
+  assert.match(message, /Nonce: nonce1234/);
   assert.match(message, /Expiration Time:/);
+});
+
+test("auth nonce format is compatible with Sign In With Solana", () => {
+  const nonce = createAuthNonce();
+  assert.match(nonce, /^[A-Za-z0-9]{8,}$/);
 });
 
 test("remaining claim supports partial payout without new views", () => {
@@ -128,6 +137,40 @@ test("campaign transaction intent derives all required program accounts", async 
   assert.ok(result.transaction.instructions[1].accounts.creatorTokenAccount);
 });
 
+test("campaign activation requires a finalized event matching its intent", () => {
+  const intent = {
+    creator_wallet: "11111111111111111111111111111111",
+    tx_signature: "signature-1",
+    campaign_data: {
+      budget: "500000000",
+      cpm: "2000000",
+      max_payout_per_video: "50000000",
+      start_time: 100,
+      end_time: 200,
+    },
+  };
+  const payload = {
+    creator: intent.creator_wallet,
+    budget: "500000000",
+    cpm: "2000000",
+    max_payout_per_video: "50000000",
+    start_time: "100",
+    end_time: "200",
+  };
+  assert.doesNotThrow(() =>
+    assertCampaignIntentMatchesEvent(intent, payload, "signature-1")
+  );
+  assert.throws(
+    () =>
+      assertCampaignIntentMatchesEvent(
+        intent,
+        { ...payload, budget: "1" },
+        "signature-1"
+      ),
+    /does not match its verified intent/
+  );
+});
+
 test("submission transaction intent derives submission and stats PDAs", async () => {
   const campaign = "11111111111111111111111111111111";
   const clipper = "So11111111111111111111111111111111111111112";
@@ -173,7 +216,8 @@ test("chain indexer quarantines rejected business events and continues", async (
   const deadLetters = [];
   const resolved = [];
   const result = await processDecodedEvents({
-    txSignature: "signature-for-unit-test-0000000000000000000000000000000000000000",
+    txSignature:
+      "signature-for-unit-test-0000000000000000000000000000000000000000",
     events: [
       { eventIndex: 0, eventName: "SubmissionRegistered", payload: {} },
       { eventIndex: 1, eventName: "Claimed", payload: {} },
@@ -184,7 +228,8 @@ test("chain indexer quarantines rejected business events and continues", async (
       processed.push(event.eventIndex);
     },
     recordDeadLetter: async (event) => deadLetters.push(event.eventIndex),
-    resolveDeadLetter: async (_signature, eventIndex) => resolved.push(eventIndex),
+    resolveDeadLetter: async (_signature, eventIndex) =>
+      resolved.push(eventIndex),
   });
   assert.deepEqual(result, { processed: 1, quarantined: 1 });
   assert.deepEqual(processed, [1]);
@@ -201,10 +246,14 @@ test("chain indexer does not quarantine infrastructure failures", async () => {
     isQuarantinableIndexerError(new AppError(500, "DATABASE_ERROR", "Failed")),
     false
   );
-  assert.equal(isQuarantinableIndexerError(new Error("RPC unavailable")), false);
+  assert.equal(
+    isQuarantinableIndexerError(new Error("RPC unavailable")),
+    false
+  );
   await assert.rejects(
     processDecodedEvents({
-      txSignature: "signature-for-unit-test-1111111111111111111111111111111111111111",
+      txSignature:
+        "signature-for-unit-test-1111111111111111111111111111111111111111",
       events: [{ eventIndex: 0, eventName: "Claimed", payload: {} }],
       processEvent: async () => {
         throw new Error("database unavailable");
