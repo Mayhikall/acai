@@ -107,11 +107,15 @@ router.post(
 router.get(
   "/indexer/dead-letters",
   asyncHandler(async (req, res) => {
-    const { includeResolved, limit } = z.object({
-      includeResolved: z.enum(["true", "false"]).default("false"),
-      limit: z.coerce.number().int().min(1).max(100).default(50),
-    }).parse(req.query);
-    const query = db("indexer_dead_letters").orderBy("last_seen_at", "desc").limit(limit);
+    const { includeResolved, limit } = z
+      .object({
+        includeResolved: z.enum(["true", "false"]).default("false"),
+        limit: z.coerce.number().int().min(1).max(100).default(50),
+      })
+      .parse(req.query);
+    const query = db("indexer_dead_letters")
+      .orderBy("last_seen_at", "desc")
+      .limit(limit);
     if (includeResolved !== "true") query.whereNull("resolved_at");
     res.json({ deadLetters: await query });
   })
@@ -120,11 +124,16 @@ router.get(
 router.post(
   "/indexer/dead-letters/:signature/:eventIndex/retry",
   asyncHandler(async (req, res) => {
-    const params = z.object({
-      signature: z.string().min(32),
-      eventIndex: z.coerce.number().int().nonnegative(),
-    }).parse(req.params);
-    const result = await retryIndexerDeadLetter(params.signature, params.eventIndex);
+    const params = z
+      .object({
+        signature: z.string().min(32),
+        eventIndex: z.coerce.number().int().nonnegative(),
+      })
+      .parse(req.params);
+    const result = await retryIndexerDeadLetter(
+      params.signature,
+      params.eventIndex
+    );
     res.json({ retried: true, result });
   })
 );

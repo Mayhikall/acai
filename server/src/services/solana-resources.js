@@ -25,8 +25,7 @@ export async function estimateAndApplyResourceLimits({ rpc, message }) {
       : null;
   const configuredMessage = pipe(
     message,
-    (value) =>
-      setTransactionMessageComputeUnitLimit(computeUnitLimit, value),
+    (value) => setTransactionMessageComputeUnitLimit(computeUnitLimit, value),
     (value) =>
       message.version === 1
         ? setTransactionMessageLoadedAccountsDataSizeLimit(

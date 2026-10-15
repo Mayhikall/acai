@@ -46,10 +46,11 @@ export function CreateCampaignForm() {
     }
   }, [normalizedUrl]);
 
+  const [minTimestamp] = useState(() => Date.now());
   const isValidEndDate = useMemo(() => {
     const timestamp = new Date(endDate).getTime();
-    return !Number.isNaN(timestamp) && timestamp > Date.now();
-  }, [endDate]);
+    return !Number.isNaN(timestamp) && timestamp > minTimestamp;
+  }, [endDate, minTimestamp]);
 
   const body = useMemo(
     () => () => {
@@ -133,7 +134,14 @@ export function CreateCampaignForm() {
                   onChange={(event) => setSourceVideo(event.target.value)}
                 />
                 {sourceVideo && !isValidUrl && (
-                  <span style={{ color: "#ff8585", fontSize: "0.8rem", marginTop: "0.25rem", display: "block" }}>
+                  <span
+                    style={{
+                      color: "#ff8585",
+                      fontSize: "0.8rem",
+                      marginTop: "0.25rem",
+                      display: "block",
+                    }}
+                  >
                     Must be a valid URL starting with https://
                   </span>
                 )}
@@ -196,7 +204,14 @@ export function CreateCampaignForm() {
                   onChange={(event) => setEndDate(event.target.value)}
                 />
                 {endDate && !isValidEndDate && (
-                  <span style={{ color: "#ff8585", fontSize: "0.8rem", marginTop: "0.25rem", display: "block" }}>
+                  <span
+                    style={{
+                      color: "#ff8585",
+                      fontSize: "0.8rem",
+                      marginTop: "0.25rem",
+                      display: "block",
+                    }}
+                  >
                     End date must be in the future
                   </span>
                 )}

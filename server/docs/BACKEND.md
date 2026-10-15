@@ -99,23 +99,23 @@ Menghasilkan URL PDF terms sementara beserta SHA-256 `termsHash`.
 
 Field form:
 
-| Field | Format |
-|---|---|
-| `title` | 1–160 karakter |
-| `brief` | 1–10.000 karakter |
-| `sourceVideo` | URL video sumber |
-| `requiredMention` | Teks/mention yang wajib muncul |
-| `paymentMint` | Harus sama dengan `AUSDC_MINT_ADDRESS` |
-| `cpmBaseUnits` | Positive decimal string, pembayaran per 1.000 views |
-| `maxPayoutPerVideo` | Positive decimal string |
-| `budget` | Positive decimal string |
-| `startTime`, `endTime` | Unix seconds |
-| `reviewPeriod`, `appealWindow`, `appealTimeout` | Detik, positive integer |
-| `settlementPeriod`, `maxReportAge` | Detik, positive integer |
-| `finalSnapshotTolerance`, `clockSkewTolerance` | Detik; clock skew harus lebih kecil |
-| `maxVideosPerClipper` | 1–100, default 5 |
-| `minSubscribers`, `minChannelAgeDays` | Optional nonnegative integer |
-| `terms` | PDF |
+| Field                                           | Format                                              |
+| ----------------------------------------------- | --------------------------------------------------- |
+| `title`                                         | 1–160 karakter                                      |
+| `brief`                                         | 1–10.000 karakter                                   |
+| `sourceVideo`                                   | URL video sumber                                    |
+| `requiredMention`                               | Teks/mention yang wajib muncul                      |
+| `paymentMint`                                   | Harus sama dengan `AUSDC_MINT_ADDRESS`              |
+| `cpmBaseUnits`                                  | Positive decimal string, pembayaran per 1.000 views |
+| `maxPayoutPerVideo`                             | Positive decimal string                             |
+| `budget`                                        | Positive decimal string                             |
+| `startTime`, `endTime`                          | Unix seconds                                        |
+| `reviewPeriod`, `appealWindow`, `appealTimeout` | Detik, positive integer                             |
+| `settlementPeriod`, `maxReportAge`              | Detik, positive integer                             |
+| `finalSnapshotTolerance`, `clockSkewTolerance`  | Detik; clock skew harus lebih kecil                 |
+| `maxVideosPerClipper`                           | 1–100, default 5                                    |
+| `minSubscribers`, `minChannelAgeDays`           | Optional nonnegative integer                        |
+| `terms`                                         | PDF                                                 |
 
 Response `201`:
 
@@ -198,16 +198,16 @@ Public. Response `{ status: "ok", timestamp }`. Ini hanya membuktikan process HT
 
 Semua endpoint berikut memakai `x-internal-secret`:
 
-| Method | Endpoint | Fungsi |
-|---|---|---|
-| POST | `/internal/oracle/run` | Jalankan oracle untuk semua/`submissionId`. |
-| POST | `/internal/oracle/holds/:id/release` | Lepaskan report anomaly untuk dikirim. |
-| POST | `/internal/oracle/holds/:id/discard` | Buang report yang ditahan. |
-| POST | `/internal/indexer/events` | Webhook event Anchor manual; normalnya finalized indexer otomatis yang dipakai. |
-| GET | `/internal/indexer/dead-letters` | Lihat event domain-error yang dikarantina. Query `includeResolved`, `limit`. |
-| POST | `/internal/indexer/dead-letters/:signature/:eventIndex/retry` | Retry setelah dependency/data diperbaiki. |
-| POST | `/internal/maintenance/run` | Jalankan satu maintenance cycle. |
-| POST | `/internal/mock/videos/:id/views` | Ubah views fixture saat adapter mock. |
+| Method | Endpoint                                                      | Fungsi                                                                          |
+| ------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| POST   | `/internal/oracle/run`                                        | Jalankan oracle untuk semua/`submissionId`.                                     |
+| POST   | `/internal/oracle/holds/:id/release`                          | Lepaskan report anomaly untuk dikirim.                                          |
+| POST   | `/internal/oracle/holds/:id/discard`                          | Buang report yang ditahan.                                                      |
+| POST   | `/internal/indexer/events`                                    | Webhook event Anchor manual; normalnya finalized indexer otomatis yang dipakai. |
+| GET    | `/internal/indexer/dead-letters`                              | Lihat event domain-error yang dikarantina. Query `includeResolved`, `limit`.    |
+| POST   | `/internal/indexer/dead-letters/:signature/:eventIndex/retry` | Retry setelah dependency/data diperbaiki.                                       |
+| POST   | `/internal/maintenance/run`                                   | Jalankan satu maintenance cycle.                                                |
+| POST   | `/internal/mock/videos/:id/views`                             | Ubah views fixture saat adapter mock.                                           |
 
 Error domain 4xx dari event otomatis masuk dead-letter agar checkpoint lanjut. Error RPC/database/decoder menghentikan cycle dan dicoba ulang tanpa melewati transaksi tersebut.
 

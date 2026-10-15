@@ -12,18 +12,29 @@ let running = false;
 
 function required(name) {
   const value = process.env[name];
-  if (!value) throw new Error(`${name} is required when chain indexer is enabled`);
+  if (!value)
+    throw new Error(`${name} is required when chain indexer is enabled`);
   return value;
 }
 
 function normalize(value) {
-  if (value == null || typeof value === "string" || typeof value === "number" || typeof value === "boolean") return value;
+  if (
+    value == null ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  )
+    return value;
   if (typeof value === "bigint") return value.toString();
   if (Buffer.isBuffer(value) || value instanceof Uint8Array) return [...value];
   if (Array.isArray(value)) return value.map(normalize);
   if (typeof value.toBase58 === "function") return value.toBase58();
-  if (typeof value.toString === "function" && value.constructor?.name === "BN") return value.toString(10);
-  if (typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, normalize(item)]));
+  if (typeof value.toString === "function" && value.constructor?.name === "BN")
+    return value.toString(10);
+  if (typeof value === "object")
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, normalize(item)])
+    );
   throw new TypeError(`Unsupported event value type: ${typeof value}`);
 }
 
@@ -38,13 +49,17 @@ function loadIdl() {
   return idl;
 }
 
-export function createEventDecoder({ idl = loadIdl(), programId = required("VAULT_PROGRAM_ID") } = {}) {
+export function createEventDecoder({
+  idl = loadIdl(),
+  programId = required("VAULT_PROGRAM_ID"),
+} = {}) {
   const parser = new EventParser(new PublicKey(programId), new BorshCoder(idl));
-  return (logs = []) => [...parser.parseLogs(logs)].map((event, eventIndex) => ({
-    eventIndex,
-    eventName: event.name,
-    payload: normalize(event.data),
-  }));
+  return (logs = []) =>
+    [...parser.parseLogs(logs)].map((event, eventIndex) => ({
+      eventIndex,
+      eventName: event.name,
+      payload: normalize(event.data),
+    }));
 }
 
 async function cursorId() {
@@ -68,7 +83,10 @@ async function saveCursor(signature, slot, error = null) {
     await db("indexer_cursor")
       .insert({ id, ...common, consecutive_failures: 1 })
       .onConflict("id")
-      .merge({ ...common, consecutive_failures: db.raw("indexer_cursor.consecutive_failures + 1") });
+      .merge({
+        ...common,
+        consecutive_failures: db.raw("indexer_cursor.consecutive_failures + 1"),
+      });
   } else {
     await db("indexer_cursor")
       .insert({ id, ...common, consecutive_failures: 0 })
@@ -79,26 +97,43 @@ async function saveCursor(signature, slot, error = null) {
 
 async function seedAtHead(connection) {
   const program = new PublicKey(required("VAULT_PROGRAM_ID"));
-  const [head] = await connection.getSignaturesForAddress(program, { limit: 1 }, "finalized");
+  const [head] = await connection.getSignaturesForAddress(
+    program,
+    { limit: 1 },
+    "finalized"
+  );
   await saveCursor(head?.signature ?? null, head?.slot ?? 0);
-  return { seeded: true, signature: head?.signature ?? null, slot: head?.slot ?? null };
+  return {
+    seeded: true,
+    signature: head?.signature ?? null,
+    slot: head?.slot ?? null,
+  };
 }
 
 async function collectNewSignatures(connection, lastSignature) {
   const program = new PublicKey(required("VAULT_PROGRAM_ID"));
-  const maxPages = Math.max(1, Number(process.env.CHAIN_INDEXER_MAX_PAGES || 10));
+  const maxPages = Math.max(
+    1,
+    Number(process.env.CHAIN_INDEXER_MAX_PAGES || 10)
+  );
   const collected = [];
   let before;
   for (let pageNumber = 0; pageNumber < maxPages; pageNumber += 1) {
     const options = { limit: PAGE_SIZE };
     if (before) options.before = before;
     if (lastSignature) options.until = lastSignature;
-    const page = await connection.getSignaturesForAddress(program, options, "finalized");
+    const page = await connection.getSignaturesForAddress(
+      program,
+      options,
+      "finalized"
+    );
     collected.push(...page);
     if (page.length < PAGE_SIZE) return collected.reverse();
     before = page.at(-1).signature;
   }
-  throw new Error(`Indexer backlog exceeds ${maxPages * PAGE_SIZE} transactions; increase CHAIN_INDEXER_MAX_PAGES`);
+  throw new Error(
+    `Indexer backlog exceeds ${maxPages * PAGE_SIZE} transactions; increase CHAIN_INDEXER_MAX_PAGES`
+  );
 }
 
 export function isQuarantinableIndexerError(error) {
@@ -132,8 +167,18 @@ export async function retryIndexerDeadLetter(txSignature, eventIndex) {
   const row = await db("indexer_dead_letters")
     .where({ tx_signature: txSignature, event_index: eventIndex })
     .first();
-  if (!row) throw new AppError(404, "DEAD_LETTER_NOT_FOUND", "Indexer dead letter not found");
-  const event = { txSignature: row.tx_signature, eventIndex: row.event_index, eventName: row.event_name, payload: row.payload };
+  if (!row)
+    throw new AppError(
+      404,
+      "DEAD_LETTER_NOT_FOUND",
+      "Indexer dead letter not found"
+    );
+  const event = {
+    txSignature: row.tx_signature,
+    eventIndex: row.event_index,
+    eventName: row.event_name,
+    payload: row.payload,
+  };
   try {
     const result = await processIndexerEvent(event);
     await resolveIndexerDeadLetter(txSignature, eventIndex);
@@ -144,7 +189,13 @@ export async function retryIndexerDeadLetter(txSignature, eventIndex) {
   }
 }
 
-export async function processDecodedEvents({ txSignature, events, processEvent = processIndexerEvent, recordDeadLetter = recordIndexerDeadLetter, resolveDeadLetter = resolveIndexerDeadLetter }) {
+export async function processDecodedEvents({
+  txSignature,
+  events,
+  processEvent = processIndexerEvent,
+  recordDeadLetter = recordIndexerDeadLetter,
+  resolveDeadLetter = resolveIndexerDeadLetter,
+}) {
   let processed = 0;
   let quarantined = 0;
   for (const event of events) {
@@ -170,12 +221,16 @@ export async function runChainIndexerCycle({ logger = console } = {}) {
     const decode = createEventDecoder();
     let cursor = await getCursor();
     if (!cursor) {
-      if (process.env.CHAIN_INDEXER_BACKFILL_ON_START !== "true") return await seedAtHead(connection);
+      if (process.env.CHAIN_INDEXER_BACKFILL_ON_START !== "true")
+        return await seedAtHead(connection);
       const id = await cursorId();
       await db("indexer_cursor").insert({ id }).onConflict("id").ignore();
       cursor = await getCursor();
     }
-    const signatures = await collectNewSignatures(connection, cursor.last_signature);
+    const signatures = await collectNewSignatures(
+      connection,
+      cursor.last_signature
+    );
     let eventCount = 0;
     let quarantinedCount = 0;
     for (const item of signatures) {
@@ -184,18 +239,33 @@ export async function runChainIndexerCycle({ logger = console } = {}) {
           commitment: "finalized",
           maxSupportedTransactionVersion: 1,
         });
-        if (!transaction) throw new Error(`Finalized transaction unavailable: ${item.signature}`);
+        if (!transaction)
+          throw new Error(
+            `Finalized transaction unavailable: ${item.signature}`
+          );
         const events = decode(transaction.meta?.logMessages ?? []);
-        const outcome = await processDecodedEvents({ txSignature: item.signature, events });
+        const outcome = await processDecodedEvents({
+          txSignature: item.signature,
+          events,
+        });
         eventCount += outcome.processed;
         quarantinedCount += outcome.quarantined;
       }
       await saveCursor(item.signature, item.slot);
     }
-    return { transactions: signatures.length, events: eventCount, quarantined: quarantinedCount, slot: signatures.at(-1)?.slot ?? cursor.last_slot };
+    return {
+      transactions: signatures.length,
+      events: eventCount,
+      quarantined: quarantinedCount,
+      slot: signatures.at(-1)?.slot ?? cursor.last_slot,
+    };
   } catch (error) {
     const cursor = await getCursor().catch(() => null);
-    await saveCursor(cursor?.last_signature ?? null, cursor?.last_slot ?? 0, error).catch(() => {});
+    await saveCursor(
+      cursor?.last_signature ?? null,
+      cursor?.last_slot ?? 0,
+      error
+    ).catch(() => {});
     logger.error?.({ err: error }, "Chain indexer cycle failed");
     throw error;
   } finally {
@@ -205,7 +275,10 @@ export async function runChainIndexerCycle({ logger = console } = {}) {
 
 export function startChainIndexer(logger = console) {
   if (process.env.CHAIN_INDEXER_ENABLED !== "true") return () => {};
-  const baseInterval = Math.max(Number(process.env.CHAIN_INDEXER_INTERVAL_SECONDS || 5) * 1000, 1000);
+  const baseInterval = Math.max(
+    Number(process.env.CHAIN_INDEXER_INTERVAL_SECONDS || 5) * 1000,
+    1000
+  );
   let stopped = false;
   const execute = async () => {
     if (stopped) return;
@@ -213,7 +286,9 @@ export function startChainIndexer(logger = console) {
     try {
       await runChainIndexerCycle({ logger });
     } catch {
-      const failures = Number((await getCursor().catch(() => null))?.consecutive_failures || 1);
+      const failures = Number(
+        (await getCursor().catch(() => null))?.consecutive_failures || 1
+      );
       delay = Math.min(baseInterval * 2 ** Math.min(failures, 6), 300_000);
     }
     if (!stopped) {

@@ -52,12 +52,19 @@ export function VaultCard() {
           <span>⚡</span> On-Chain Codama Client Generated
         </div>
         <div>
-          Typed client instructions (InitializeConfig, InitializeCampaign, RegisterSubmission, SubmitOracleReport, Claim, Refund) are compiled and ready.
+          Typed client instructions (InitializeConfig, InitializeCampaign,
+          RegisterSubmission, SubmitOracleReport, Claim, Refund) are compiled
+          and ready.
         </div>
       </div>
 
       <div className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center justify-between pt-2">
-        <span>Connected: {isConnected ? `${wallet.account.address.slice(0, 4)}...${wallet.account.address.slice(-4)}` : "None"}</span>
+        <span>
+          Connected:{" "}
+          {isConnected
+            ? `${wallet.account.address.slice(0, 4)}...${wallet.account.address.slice(-4)}`
+            : "None"}
+        </span>
         <span>Network: {cluster}</span>
       </div>
     </div>

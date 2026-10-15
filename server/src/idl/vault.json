@@ -9,16 +9,7 @@
   "instructions": [
     {
       "name": "accept_admin",
-      "discriminator": [
-        112,
-        42,
-        45,
-        90,
-        116,
-        181,
-        13,
-        170
-      ],
+      "discriminator": [112, 42, 45, 90, 116, 181, 13, 170],
       "accounts": [
         {
           "name": "config",
@@ -27,14 +18,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
+                "value": [99, 111, 110, 102, 105, 103]
               }
             ]
           }
@@ -48,16 +32,7 @@
     },
     {
       "name": "accept_submission",
-      "discriminator": [
-        65,
-        133,
-        222,
-        91,
-        162,
-        82,
-        229,
-        203
-      ],
+      "discriminator": [65, 133, 222, 91, 162, 82, 229, 203],
       "accounts": [
         {
           "name": "campaign",
@@ -65,16 +40,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -88,9 +54,7 @@
               }
             ]
           },
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         },
         {
           "name": "submission",
@@ -99,18 +63,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  109,
-                  105,
-                  115,
-                  115,
-                  105,
-                  111,
-                  110
-                ]
+                "value": [115, 117, 98, 109, 105, 115, 115, 105, 111, 110]
               },
               {
                 "kind": "account",
@@ -131,13 +84,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
+                "value": [115, 116, 97, 116, 115]
               },
               {
                 "kind": "account",
@@ -154,25 +101,14 @@
         {
           "name": "creator",
           "signer": true,
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         }
       ],
       "args": []
     },
     {
       "name": "appeal_submission",
-      "discriminator": [
-        159,
-        42,
-        14,
-        135,
-        8,
-        135,
-        128,
-        150
-      ],
+      "discriminator": [159, 42, 14, 135, 8, 135, 128, 150],
       "accounts": [
         {
           "name": "campaign",
@@ -180,16 +116,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -203,9 +130,7 @@
               }
             ]
           },
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         },
         {
           "name": "submission",
@@ -214,18 +139,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  109,
-                  105,
-                  115,
-                  115,
-                  105,
-                  111,
-                  110
-                ]
+                "value": [115, 117, 98, 109, 105, 115, 115, 105, 111, 110]
               },
               {
                 "kind": "account",
@@ -246,13 +160,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
+                "value": [115, 116, 97, 116, 115]
               },
               {
                 "kind": "account",
@@ -268,25 +176,14 @@
         {
           "name": "clipper",
           "signer": true,
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         }
       ],
       "args": []
     },
     {
       "name": "claim",
-      "discriminator": [
-        62,
-        198,
-        214,
-        193,
-        213,
-        159,
-        108,
-        210
-      ],
+      "discriminator": [62, 198, 214, 193, 213, 159, 108, 210],
       "accounts": [
         {
           "name": "config",
@@ -294,14 +191,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
+                "value": [99, 111, 110, 102, 105, 103]
               }
             ]
           }
@@ -313,16 +203,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -336,9 +217,7 @@
               }
             ]
           },
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         },
         {
           "name": "vault",
@@ -347,13 +226,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
+                "value": [118, 97, 117, 108, 116]
               },
               {
                 "kind": "account",
@@ -361,9 +234,7 @@
               }
             ]
           },
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "submission",
@@ -372,18 +243,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  109,
-                  105,
-                  115,
-                  115,
-                  105,
-                  111,
-                  110
-                ]
+                "value": [115, 117, 98, 109, 105, 115, 115, 105, 111, 110]
               },
               {
                 "kind": "account",
@@ -396,9 +256,7 @@
               }
             ]
           },
-          "relations": [
-            "report"
-          ]
+          "relations": ["report"]
         },
         {
           "name": "report",
@@ -406,14 +264,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  112,
-                  111,
-                  114,
-                  116
-                ]
+                "value": [114, 101, 112, 111, 114, 116]
               },
               {
                 "kind": "account",
@@ -428,17 +279,13 @@
         },
         {
           "name": "mint",
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "clipper",
           "writable": true,
           "signer": true,
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         },
         {
           "name": "token_program",
@@ -449,16 +296,7 @@
     },
     {
       "name": "close_report",
-      "discriminator": [
-        110,
-        5,
-        130,
-        2,
-        12,
-        239,
-        166,
-        51
-      ],
+      "discriminator": [110, 5, 130, 2, 12, 239, 166, 51],
       "accounts": [
         {
           "name": "campaign",
@@ -466,16 +304,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -489,9 +318,7 @@
               }
             ]
           },
-          "relations": [
-            "report"
-          ]
+          "relations": ["report"]
         },
         {
           "name": "report",
@@ -500,14 +327,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  112,
-                  111,
-                  114,
-                  116
-                ]
+                "value": [114, 101, 112, 111, 114, 116]
               },
               {
                 "kind": "account",
@@ -523,14 +343,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
+                "value": [99, 111, 110, 102, 105, 103]
               }
             ]
           }
@@ -548,16 +361,7 @@
     },
     {
       "name": "close_stats",
-      "discriminator": [
-        174,
-        17,
-        184,
-        167,
-        73,
-        29,
-        255,
-        61
-      ],
+      "discriminator": [174, 17, 184, 167, 73, 29, 255, 61],
       "accounts": [
         {
           "name": "campaign",
@@ -565,16 +369,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -596,13 +391,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
+                "value": [115, 116, 97, 116, 115]
               },
               {
                 "kind": "account",
@@ -625,16 +414,7 @@
     },
     {
       "name": "close_submission",
-      "discriminator": [
-        204,
-        237,
-        166,
-        65,
-        57,
-        7,
-        11,
-        105
-      ],
+      "discriminator": [204, 237, 166, 65, 57, 7, 11, 105],
       "accounts": [
         {
           "name": "campaign",
@@ -642,16 +422,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -665,9 +436,7 @@
               }
             ]
           },
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         },
         {
           "name": "submission",
@@ -676,18 +445,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  109,
-                  105,
-                  115,
-                  115,
-                  105,
-                  111,
-                  110
-                ]
+                "value": [115, 117, 98, 109, 105, 115, 115, 105, 111, 110]
               },
               {
                 "kind": "account",
@@ -705,25 +463,14 @@
           "name": "clipper",
           "writable": true,
           "signer": true,
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         }
       ],
       "args": []
     },
     {
       "name": "close_unfunded",
-      "discriminator": [
-        6,
-        217,
-        112,
-        91,
-        250,
-        92,
-        103,
-        70
-      ],
+      "discriminator": [6, 217, 112, 91, 250, 92, 103, 70],
       "accounts": [
         {
           "name": "campaign",
@@ -732,16 +479,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -760,25 +498,14 @@
           "name": "creator",
           "writable": true,
           "signer": true,
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         }
       ],
       "args": []
     },
     {
       "name": "finalize_timeout",
-      "discriminator": [
-        112,
-        138,
-        236,
-        182,
-        22,
-        98,
-        125,
-        25
-      ],
+      "discriminator": [112, 138, 236, 182, 22, 98, 125, 25],
       "accounts": [
         {
           "name": "campaign",
@@ -786,16 +513,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -809,9 +527,7 @@
               }
             ]
           },
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         },
         {
           "name": "submission",
@@ -820,18 +536,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  109,
-                  105,
-                  115,
-                  115,
-                  105,
-                  111,
-                  110
-                ]
+                "value": [115, 117, 98, 109, 105, 115, 115, 105, 111, 110]
               },
               {
                 "kind": "account",
@@ -850,16 +555,7 @@
     },
     {
       "name": "fund_campaign",
-      "discriminator": [
-        109,
-        57,
-        56,
-        239,
-        99,
-        111,
-        221,
-        121
-      ],
+      "discriminator": [109, 57, 56, 239, 99, 111, 221, 121],
       "accounts": [
         {
           "name": "campaign",
@@ -868,16 +564,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -899,13 +586,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
+                "value": [118, 97, 117, 108, 116]
               },
               {
                 "kind": "account",
@@ -920,17 +601,13 @@
         },
         {
           "name": "mint",
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "creator",
           "writable": true,
           "signer": true,
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "token_program",
@@ -949,16 +626,7 @@
     },
     {
       "name": "initialize_campaign",
-      "discriminator": [
-        169,
-        88,
-        7,
-        6,
-        9,
-        165,
-        65,
-        132
-      ],
+      "discriminator": [169, 88, 7, 6, 9, 165, 65, 132],
       "accounts": [
         {
           "name": "campaign",
@@ -967,16 +635,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -1015,16 +674,7 @@
     },
     {
       "name": "initialize_config",
-      "discriminator": [
-        208,
-        127,
-        21,
-        1,
-        194,
-        190,
-        196,
-        70
-      ],
+      "discriminator": [208, 127, 21, 1, 194, 190, 196, 70],
       "accounts": [
         {
           "name": "config",
@@ -1033,14 +683,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
+                "value": [99, 111, 110, 102, 105, 103]
               }
             ]
           }
@@ -1083,16 +726,7 @@
     },
     {
       "name": "propose_admin",
-      "discriminator": [
-        121,
-        214,
-        199,
-        212,
-        87,
-        39,
-        117,
-        234
-      ],
+      "discriminator": [121, 214, 199, 212, 87, 39, 117, 234],
       "accounts": [
         {
           "name": "config",
@@ -1101,14 +735,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
+                "value": [99, 111, 110, 102, 105, 103]
               }
             ]
           }
@@ -1116,9 +743,7 @@
         {
           "name": "admin",
           "signer": true,
-          "relations": [
-            "config"
-          ]
+          "relations": ["config"]
         }
       ],
       "args": [
@@ -1130,16 +755,7 @@
     },
     {
       "name": "refund",
-      "discriminator": [
-        2,
-        96,
-        183,
-        251,
-        63,
-        208,
-        46,
-        46
-      ],
+      "discriminator": [2, 96, 183, 251, 63, 208, 46, 46],
       "accounts": [
         {
           "name": "campaign",
@@ -1148,16 +764,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -1179,13 +786,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
+                "value": [118, 97, 117, 108, 116]
               },
               {
                 "kind": "account",
@@ -1193,9 +794,7 @@
               }
             ]
           },
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "creator_token_account",
@@ -1203,17 +802,13 @@
         },
         {
           "name": "mint",
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "creator",
           "writable": true,
           "signer": true,
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "token_program",
@@ -1224,16 +819,7 @@
     },
     {
       "name": "register_submission",
-      "discriminator": [
-        55,
-        137,
-        111,
-        27,
-        8,
-        157,
-        187,
-        218
-      ],
+      "discriminator": [55, 137, 111, 27, 8, 157, 187, 218],
       "accounts": [
         {
           "name": "campaign",
@@ -1242,16 +828,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -1273,18 +850,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  109,
-                  105,
-                  115,
-                  115,
-                  105,
-                  111,
-                  110
-                ]
+                "value": [115, 117, 98, 109, 105, 115, 115, 105, 111, 110]
               },
               {
                 "kind": "account",
@@ -1304,13 +870,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
+                "value": [115, 116, 97, 116, 115]
               },
               {
                 "kind": "account",
@@ -1341,26 +901,14 @@
         {
           "name": "terms_hash",
           "type": {
-            "array": [
-              "u8",
-              32
-            ]
+            "array": ["u8", 32]
           }
         }
       ]
     },
     {
       "name": "reject_submission",
-      "discriminator": [
-        2,
-        92,
-        1,
-        81,
-        148,
-        156,
-        6,
-        160
-      ],
+      "discriminator": [2, 92, 1, 81, 148, 156, 6, 160],
       "accounts": [
         {
           "name": "campaign",
@@ -1368,16 +916,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -1391,9 +930,7 @@
               }
             ]
           },
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         },
         {
           "name": "submission",
@@ -1402,18 +939,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  109,
-                  105,
-                  115,
-                  115,
-                  105,
-                  111,
-                  110
-                ]
+                "value": [115, 117, 98, 109, 105, 115, 115, 105, 111, 110]
               },
               {
                 "kind": "account",
@@ -1434,13 +960,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
+                "value": [115, 116, 97, 116, 115]
               },
               {
                 "kind": "account",
@@ -1457,35 +977,21 @@
         {
           "name": "creator",
           "signer": true,
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         }
       ],
       "args": [
         {
           "name": "reason_hash",
           "type": {
-            "array": [
-              "u8",
-              32
-            ]
+            "array": ["u8", 32]
           }
         }
       ]
     },
     {
       "name": "submit_oracle_report",
-      "discriminator": [
-        141,
-        255,
-        247,
-        6,
-        153,
-        214,
-        17,
-        103
-      ],
+      "discriminator": [141, 255, 247, 6, 153, 214, 17, 103],
       "accounts": [
         {
           "name": "config",
@@ -1493,14 +999,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
+                "value": [99, 111, 110, 102, 105, 103]
               }
             ]
           }
@@ -1511,16 +1010,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -1534,9 +1024,7 @@
               }
             ]
           },
-          "relations": [
-            "submission"
-          ]
+          "relations": ["submission"]
         },
         {
           "name": "submission",
@@ -1545,18 +1033,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  109,
-                  105,
-                  115,
-                  115,
-                  105,
-                  111,
-                  110
-                ]
+                "value": [115, 117, 98, 109, 105, 115, 115, 105, 111, 110]
               },
               {
                 "kind": "account",
@@ -1577,14 +1054,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  112,
-                  111,
-                  114,
-                  116
-                ]
+                "value": [114, 101, 112, 111, 114, 116]
               },
               {
                 "kind": "account",
@@ -1620,16 +1090,7 @@
     },
     {
       "name": "top_up",
-      "discriminator": [
-        236,
-        225,
-        96,
-        9,
-        60,
-        106,
-        77,
-        208
-      ],
+      "discriminator": [236, 225, 96, 9, 60, 106, 77, 208],
       "accounts": [
         {
           "name": "campaign",
@@ -1638,16 +1099,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  97,
-                  109,
-                  112,
-                  97,
-                  105,
-                  103,
-                  110
-                ]
+                "value": [99, 97, 109, 112, 97, 105, 103, 110]
               },
               {
                 "kind": "account",
@@ -1665,9 +1117,7 @@
         {
           "name": "vault",
           "writable": true,
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "creator_token_account",
@@ -1675,17 +1125,13 @@
         },
         {
           "name": "mint",
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "creator",
           "writable": true,
           "signer": true,
-          "relations": [
-            "campaign"
-          ]
+          "relations": ["campaign"]
         },
         {
           "name": "token_program",
@@ -1701,16 +1147,7 @@
     },
     {
       "name": "update_oracle",
-      "discriminator": [
-        112,
-        41,
-        209,
-        18,
-        248,
-        226,
-        252,
-        188
-      ],
+      "discriminator": [112, 41, 209, 18, 248, 226, 252, 188],
       "accounts": [
         {
           "name": "config",
@@ -1719,14 +1156,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
+                "value": [99, 111, 110, 102, 105, 103]
               }
             ]
           }
@@ -1734,9 +1164,7 @@
         {
           "name": "admin",
           "signer": true,
-          "relations": [
-            "config"
-          ]
+          "relations": ["config"]
         }
       ],
       "args": [
@@ -1750,265 +1178,85 @@
   "accounts": [
     {
       "name": "Campaign",
-      "discriminator": [
-        50,
-        40,
-        49,
-        11,
-        157,
-        220,
-        229,
-        192
-      ]
+      "discriminator": [50, 40, 49, 11, 157, 220, 229, 192]
     },
     {
       "name": "ClipperStats",
-      "discriminator": [
-        46,
-        200,
-        103,
-        103,
-        49,
-        157,
-        72,
-        139
-      ]
+      "discriminator": [46, 200, 103, 103, 49, 157, 72, 139]
     },
     {
       "name": "Config",
-      "discriminator": [
-        155,
-        12,
-        170,
-        224,
-        30,
-        250,
-        204,
-        130
-      ]
+      "discriminator": [155, 12, 170, 224, 30, 250, 204, 130]
     },
     {
       "name": "OracleReport",
-      "discriminator": [
-        72,
-        98,
-        174,
-        167,
-        90,
-        119,
-        146,
-        220
-      ]
+      "discriminator": [72, 98, 174, 167, 90, 119, 146, 220]
     },
     {
       "name": "Submission",
-      "discriminator": [
-        58,
-        194,
-        159,
-        158,
-        75,
-        102,
-        178,
-        197
-      ]
+      "discriminator": [58, 194, 159, 158, 75, 102, 178, 197]
     }
   ],
   "events": [
     {
       "name": "AdminProposed",
-      "discriminator": [
-        129,
-        249,
-        226,
-        227,
-        199,
-        82,
-        110,
-        243
-      ]
+      "discriminator": [129, 249, 226, 227, 199, 82, 110, 243]
     },
     {
       "name": "AdminTransferred",
-      "discriminator": [
-        255,
-        147,
-        182,
-        5,
-        199,
-        217,
-        38,
-        179
-      ]
+      "discriminator": [255, 147, 182, 5, 199, 217, 38, 179]
     },
     {
       "name": "CampaignClosed",
-      "discriminator": [
-        158,
-        143,
-        128,
-        251,
-        84,
-        131,
-        2,
-        90
-      ]
+      "discriminator": [158, 143, 128, 251, 84, 131, 2, 90]
     },
     {
       "name": "CampaignFunded",
-      "discriminator": [
-        46,
-        83,
-        210,
-        201,
-        110,
-        227,
-        24,
-        212
-      ]
+      "discriminator": [46, 83, 210, 201, 110, 227, 24, 212]
     },
     {
       "name": "CampaignInitialized",
-      "discriminator": [
-        22,
-        192,
-        125,
-        123,
-        243,
-        139,
-        58,
-        7
-      ]
+      "discriminator": [22, 192, 125, 123, 243, 139, 58, 7]
     },
     {
       "name": "CampaignToppedUp",
-      "discriminator": [
-        6,
-        25,
-        234,
-        124,
-        163,
-        114,
-        164,
-        103
-      ]
+      "discriminator": [6, 25, 234, 124, 163, 114, 164, 103]
     },
     {
       "name": "Claimed",
-      "discriminator": [
-        217,
-        192,
-        123,
-        72,
-        108,
-        150,
-        248,
-        33
-      ]
+      "discriminator": [217, 192, 123, 72, 108, 150, 248, 33]
     },
     {
       "name": "OracleReportSubmitted",
-      "discriminator": [
-        99,
-        142,
-        147,
-        35,
-        26,
-        190,
-        68,
-        166
-      ]
+      "discriminator": [99, 142, 147, 35, 26, 190, 68, 166]
     },
     {
       "name": "OracleUpdated",
-      "discriminator": [
-        138,
-        9,
-        51,
-        219,
-        228,
-        198,
-        11,
-        147
-      ]
+      "discriminator": [138, 9, 51, 219, 228, 198, 11, 147]
     },
     {
       "name": "Refunded",
-      "discriminator": [
-        35,
-        103,
-        149,
-        246,
-        196,
-        123,
-        221,
-        99
-      ]
+      "discriminator": [35, 103, 149, 246, 196, 123, 221, 99]
     },
     {
       "name": "SubmissionAccepted",
-      "discriminator": [
-        71,
-        157,
-        109,
-        94,
-        96,
-        129,
-        57,
-        216
-      ]
+      "discriminator": [71, 157, 109, 94, 96, 129, 57, 216]
     },
     {
       "name": "SubmissionAppealed",
-      "discriminator": [
-        151,
-        246,
-        226,
-        161,
-        34,
-        2,
-        97,
-        81
-      ]
+      "discriminator": [151, 246, 226, 161, 34, 2, 97, 81]
     },
     {
       "name": "SubmissionFinalized",
-      "discriminator": [
-        212,
-        38,
-        73,
-        189,
-        88,
-        7,
-        72,
-        89
-      ]
+      "discriminator": [212, 38, 73, 189, 88, 7, 72, 89]
     },
     {
       "name": "SubmissionRegistered",
-      "discriminator": [
-        225,
-        244,
-        121,
-        161,
-        176,
-        109,
-        97,
-        59
-      ]
+      "discriminator": [225, 244, 121, 161, 176, 109, 97, 59]
     },
     {
       "name": "SubmissionRejected",
-      "discriminator": [
-        222,
-        120,
-        204,
-        232,
-        51,
-        196,
-        71,
-        146
-      ]
+      "discriminator": [222, 120, 204, 232, 51, 196, 71, 146]
     }
   ],
   "errors": [
@@ -2255,10 +1503,7 @@
           {
             "name": "terms_hash",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -2531,10 +1776,7 @@
           {
             "name": "terms_hash",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -2720,10 +1962,7 @@
           {
             "name": "terms_hash",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -2752,10 +1991,7 @@
             "name": "reason_hash",
             "type": {
               "option": {
-                "array": [
-                  "u8",
-                  32
-                ]
+                "array": ["u8", 32]
               }
             }
           },
@@ -2904,10 +2140,7 @@
           {
             "name": "reason_hash",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {

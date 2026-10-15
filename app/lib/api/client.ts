@@ -44,10 +44,14 @@ export async function apiRequest<T>(path: string, options: ApiOptions = {}) {
 
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
-    let message = payload?.error?.message || payload?.message || "Request failed";
-    if (Array.isArray(payload?.error?.details) && payload.error.details.length > 0) {
+    let message =
+      payload?.error?.message || payload?.message || "Request failed";
+    if (
+      Array.isArray(payload?.error?.details) &&
+      payload.error.details.length > 0
+    ) {
       const issues = payload.error.details
-        .map((d: any) => {
+        .map((d: { path?: string | (string | number)[]; message?: string }) => {
           const path = Array.isArray(d.path) ? d.path.join(".") : d.path;
           return path ? `${path}: ${d.message}` : d.message;
         })

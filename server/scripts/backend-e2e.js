@@ -20,7 +20,9 @@ let server;
 let serverLog = "";
 
 function fail(label, response, body) {
-  const logs = serverLog ? `\nLast server logs:\n${serverLog.slice(-4000)}` : "";
+  const logs = serverLog
+    ? `\nLast server logs:\n${serverLog.slice(-4000)}`
+    : "";
   throw new Error(
     `${label} failed (${response.status}): ${JSON.stringify(body)}${logs}`
   );
@@ -31,7 +33,11 @@ async function request(path, options = {}) {
   const text = await response.text();
   let body = null;
   if (text) {
-    try { body = JSON.parse(text); } catch { body = text; }
+    try {
+      body = JSON.parse(text);
+    } catch {
+      body = text;
+    }
   }
   return { response, body };
 }
@@ -72,7 +78,8 @@ async function authenticate() {
     "/auth/verify",
     json({ wallet, signature, message: nonce.body.message })
   );
-  if (!verified.response.ok) fail("Verify wallet", verified.response, verified.body);
+  if (!verified.response.ok)
+    fail("Verify wallet", verified.response, verified.body);
   return { wallet, token: verified.body.token };
 }
 
@@ -83,9 +90,19 @@ function fakeSignature(label) {
 async function indexEvent(eventName, payload) {
   const result = await request(
     "/internal/indexer/events",
-    json({ txSignature: fakeSignature(eventName), eventIndex: 0, eventName, payload }, null, true)
+    json(
+      {
+        txSignature: fakeSignature(eventName),
+        eventIndex: 0,
+        eventName,
+        payload,
+      },
+      null,
+      true
+    )
   );
-  if (!result.response.ok) fail(`Index ${eventName}`, result.response, result.body);
+  if (!result.response.ok)
+    fail(`Index ${eventName}`, result.response, result.body);
   return result.body;
 }
 
@@ -146,7 +163,8 @@ async function run() {
   const connected = await request("/youtube/connect", {
     headers: { authorization: `Bearer ${clipper.token}` },
   });
-  if (!connected.response.ok) fail("Connect mock YouTube", connected.response, connected.body);
+  if (!connected.response.ok)
+    fail("Connect mock YouTube", connected.response, connected.body);
   console.log("✓ mock YouTube channel connected");
 
   const now = Math.floor(Date.now() / 1000);
@@ -172,28 +190,42 @@ async function run() {
     maxVideosPerClipper: "5",
   };
   for (const [key, value] of Object.entries(fields)) form.append(key, value);
-  form.append("terms", new Blob(["%PDF-1.4\n% Acai local E2E terms\n%%EOF\n"], { type: "application/pdf" }), "terms.pdf");
+  form.append(
+    "terms",
+    new Blob(["%PDF-1.4\n% Acai local E2E terms\n%%EOF\n"], {
+      type: "application/pdf",
+    }),
+    "terms.pdf"
+  );
   const created = await request("/campaigns", {
     method: "POST",
     headers: { authorization: `Bearer ${creator.token}` },
     body: form,
   });
-  if (!created.response.ok) fail("Create campaign", created.response, created.body);
+  if (!created.response.ok)
+    fail("Create campaign", created.response, created.body);
   const campaign = created.body.campaign;
   if (created.body.transaction?.instructions?.length !== 2)
     throw new Error("Campaign transaction intent is incomplete");
   console.log(`✓ campaign ${campaign.id} created with transaction intent`);
 
-  await indexEvent("CampaignFunded", { campaign_id: campaign.id, amount: campaign.budget });
+  await indexEvent("CampaignFunded", {
+    campaign_id: campaign.id,
+    amount: campaign.budget,
+  });
   console.log("✓ simulated CampaignFunded event indexed");
 
   const submitted = await request(
     `/campaigns/${campaign.id}/submissions`,
     json({ videoId: "dQw4w9WgXcQ" }, clipper.token)
   );
-  if (!submitted.response.ok) fail("Create submission intent", submitted.response, submitted.body);
-  const onchainSubmission = submitted.body.transaction.instructions[0].accounts.submission;
-  console.log("✓ video ownership, duration, publish time, and mention verified");
+  if (!submitted.response.ok)
+    fail("Create submission intent", submitted.response, submitted.body);
+  const onchainSubmission =
+    submitted.body.transaction.instructions[0].accounts.submission;
+  console.log(
+    "✓ video ownership, duration, publish time, and mention verified"
+  );
 
   const registered = await indexEvent("SubmissionRegistered", {
     campaign_id: campaign.id,
@@ -215,7 +247,10 @@ async function run() {
     is_baseline: true,
     reporter,
   });
-  await indexEvent("SubmissionAccepted", { submission: onchainSubmission, accepted_at: now });
+  await indexEvent("SubmissionAccepted", {
+    submission: onchainSubmission,
+    accepted_at: now,
+  });
   console.log("✓ baseline confirmed and submission accepted");
 
   const views = await request(
@@ -223,7 +258,10 @@ async function run() {
     json({ views: 2500 }, null, true)
   );
   if (!views.response.ok) fail("Update mock views", views.response, views.body);
-  const oracle = await request("/internal/oracle/run", json({ submissionId }, null, true));
+  const oracle = await request(
+    "/internal/oracle/run",
+    json({ submissionId }, null, true)
+  );
   if (!oracle.response.ok) fail("Run oracle", oracle.response, oracle.body);
   await indexEvent("OracleReportSubmitted", {
     submission: onchainSubmission,
@@ -246,7 +284,11 @@ async function run() {
   const amount = claim.body.amount.remaining;
   console.log(`✓ claim intent ready for ${amount} base units`);
 
-  await indexEvent("Claimed", { submission: onchainSubmission, amount, remaining_claim: "0" });
+  await indexEvent("Claimed", {
+    submission: onchainSubmission,
+    amount,
+    remaining_claim: "0",
+  });
   const claims = await request(`/submissions/${submissionId}/claims`, {
     headers: { authorization: `Bearer ${clipper.token}` },
   });

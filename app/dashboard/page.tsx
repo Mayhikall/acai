@@ -35,7 +35,8 @@ export default function DashboardPage() {
           <Clapperboard size={26} />
           <h2>Clipper</h2>
           <p>
-            Discover campaigns, submit videos, track review progress, and claim rewards.
+            Discover campaigns, submit videos, track review progress, and claim
+            rewards.
           </p>
         </button>
         <button
@@ -45,7 +46,9 @@ export default function DashboardPage() {
         >
           <FolderKanban size={26} />
           <h2>Creator</h2>
-          <p>Create and fund campaigns, then review incoming clipper submissions.</p>
+          <p>
+            Create and fund campaigns, then review incoming clipper submissions.
+          </p>
         </button>
       </div>
     </>

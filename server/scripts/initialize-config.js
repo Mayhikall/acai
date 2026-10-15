@@ -94,7 +94,10 @@ const [programInfo, programDataInfo, configInfo] = await Promise.all([
 ]);
 if (!programInfo.value || programInfo.value.owner !== UPGRADEABLE_LOADER)
   throw new Error("VAULT_PROGRAM_ID is not a deployed upgradeable program");
-if (!programDataInfo.value || programDataInfo.value.owner !== UPGRADEABLE_LOADER)
+if (
+  !programDataInfo.value ||
+  programDataInfo.value.owner !== UPGRADEABLE_LOADER
+)
   throw new Error("PROGRAM_DATA_ADDRESS is invalid");
 if (configInfo.value)
   throw new Error(`Config PDA ${config} is already initialized`);
@@ -135,11 +138,8 @@ const baseMessage = pipe(
   (value) => setTransactionMessageLifetimeUsingBlockhash(latest, value),
   (value) => appendTransactionMessageInstruction(instruction, value)
 );
-const {
-  message,
-  computeUnitLimit,
-  loadedAccountsDataSizeLimit,
-} = await estimateAndApplyResourceLimits({ rpc, message: baseMessage });
+const { message, computeUnitLimit, loadedAccountsDataSizeLimit } =
+  await estimateAndApplyResourceLimits({ rpc, message: baseMessage });
 const transaction = await signTransactionMessageWithSigners(message);
 const wire = getBase64EncodedWireTransaction(transaction);
 const simulation = await rpc
@@ -165,7 +165,8 @@ console.log({
   simulationError: simulation.value.err,
   unitsConsumed: simulation.value.unitsConsumed?.toString() ?? null,
 });
-if (simulation.value.logs?.length) console.log(simulation.value.logs.join("\n"));
+if (simulation.value.logs?.length)
+  console.log(simulation.value.logs.join("\n"));
 if (simulation.value.err)
   throw new Error("initialize_config simulation failed");
 

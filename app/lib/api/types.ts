@@ -27,11 +27,7 @@ export type CampaignIntent = {
   title: string;
   budget: string;
   status:
-    | "AWAITING_SIGNATURE"
-    | "SUBMITTED"
-    | "INITIALIZED"
-    | "EXPIRED"
-    | "FAILED";
+    "AWAITING_SIGNATURE" | "SUBMITTED" | "INITIALIZED" | "EXPIRED" | "FAILED";
   txSignature?: string | null;
   expiresAt: string;
   createdAt: string;

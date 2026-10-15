@@ -7,8 +7,14 @@ export async function up(knex) {
     table.text("error_code").notNullable();
     table.text("error_message").notNullable();
     table.integer("attempts").notNullable().defaultTo(1);
-    table.timestamp("first_seen_at", { useTz: true }).notNullable().defaultTo(knex.fn.now());
-    table.timestamp("last_seen_at", { useTz: true }).notNullable().defaultTo(knex.fn.now());
+    table
+      .timestamp("first_seen_at", { useTz: true })
+      .notNullable()
+      .defaultTo(knex.fn.now());
+    table
+      .timestamp("last_seen_at", { useTz: true })
+      .notNullable()
+      .defaultTo(knex.fn.now());
     table.timestamp("resolved_at", { useTz: true });
     table.primary(["tx_signature", "event_index"]);
     table.index(["resolved_at", "last_seen_at"]);
